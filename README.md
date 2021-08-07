@@ -19,14 +19,21 @@ Candao smart-contract
 1. _Configurator_
 2. _CandaoToken_ - Token contract
 3. _Sale_ - Sale contract
+4. _FreezeWallet_ - Contract for releasing tokens in accordance with the Tokenomy
 
 ### Token distribution
-1. 
-2.
+1. _DAO_: 400 000 000
+2. _Sales_: 250 000 000
+3. _Content Mining_: 210 000 000
+4. _Liquidity pool_: 200 000 000
+5. _Foundation_: 150 000 000
+6. _Team_: 150 000 000
+7. _Marketing_: 100 000 000
+8. _Advisors_: 40 000 000
 
 ### How to manage the contracts
 To start working with the contracts, please, follow theese steps for each contract:
-1. Compile the contract using Remix with `enable optimization` flag and `compiler version` set to `0.6.2`.
+1. Compile the contract using Remix with `enable optimization` flag and `compiler version` set to `0.8.0`.
 2. Deploy the contract using Remix + MetaMask.
 
 ### Wallets with ERC20 support
@@ -44,13 +51,29 @@ EXODUS does not support ERC20, but provides the ability to export the private ke
 * [Sale](https://etherscan.io)
 
 ### Sale stages
-#### Stage 1
+#### Stage 1: "Seed"
 * Minimum purchase volume           : 
 * Maximum purchase volume           : 
 * Bonus                             : 
-* HardCap                           : 
+* HardCap                           : 50 000 000 CDO
 * Start date                        : 
 * End date                          : 
+
+#### Stage 2: "Private Sale"
+* Minimum purchase volume           :
+* Maximum purchase volume           :
+* Bonus                             :
+* HardCap                           : 100 000 000 CDO
+* Start date                        :
+* End date                          :
+
+#### Stage 1: "Public Sale"
+* Minimum purchase volume           :
+* Maximum purchase volume           :
+* Bonus                             :
+* HardCap                           : 100 000 000 CDO
+* Start date                        :
+* End date                          :
 
 ## Test network configuration (Ropsten)
 ### Contracts
