@@ -22,7 +22,7 @@ contract CandaoToken is ERC20, ERC20Burnable, Pausable, RecoverableFunds {
     }
     
     constructor(string memory name, string memory symbol, address[] memory initialAccounts, uint256[] memory initialBalances) payable ERC20(name, symbol) {
-        for(uint8 i = 0; i < initialAccounts.length - 1; i++) {
+        for(uint8 i = 0; i < initialAccounts.length; i++) {
             _mint(initialAccounts[i], initialBalances[i]);
         }
     }
@@ -36,13 +36,13 @@ contract CandaoToken is ERC20, ERC20Burnable, Pausable, RecoverableFunds {
     }
 
     function addToWhitelist(address[] memory accounts) public onlyOwner {
-        for(uint8 i = 0; i < accounts.length - 1; i++) {
+        for(uint8 i = 0; i < accounts.length; i++) {
             whitelist[accounts[i]] = true;
         }
     }
 
     function removeFromWhitelist(address[] memory accounts) public onlyOwner {
-        for(uint8 i = 0; i < accounts.length - 1; i++) {
+        for(uint8 i = 0; i < accounts.length; i++) {
             whitelist[accounts[i]] = false;
         }
     }
