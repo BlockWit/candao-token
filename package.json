@@ -1,0 +1,21 @@
+{
+  "name": "candao-token",
+  "version": "1.0.0",
+  "description": "Candao smart contracts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BlockWit/candao-token.git"
+  },
+  "author": "BlockWit",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BlockWit/candao-token/issues"
+  },
+  "homepage": "https://github.com/BlockWit/candao-token#readme",
+  "devDependencies": {
+    "truffle": "^5.4.5"
+  }
+}
