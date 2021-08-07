@@ -18,8 +18,11 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
-//
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const CONFIG = require('dotenv').config().parsed;
+const ETH_MAIN_PRIVATE_KEYS = JSON.parse(CONFIG.ETH_MAIN_PRIVATE_KEYS);
+const ETH_TEST_PRIVATE_KEYS = JSON.parse(CONFIG.ETH_TEST_PRIVATE_KEYS);
+
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
@@ -41,11 +44,12 @@ module.exports = {
     // tab if you use this network and you must also set the `host`, `port` and `network_id`
     // options below to some value.
     //
-    // development: {
-    //  host: "127.0.0.1",     // Localhost (default: none)
-    //  port: 8545,            // Standard Ethereum port (default: none)
-    //  network_id: "*",       // Any network (default: none)
-    // },
+    development: {
+     host: "127.0.0.1",     // Localhost (default: none)
+     port: 7545,            // Standard Ethereum port (default: none)
+     network_id: "*",       // Any network (default: none)
+     gas: 12000000,
+    },
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
@@ -57,14 +61,22 @@ module.exports = {
     // },
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
-    // ropsten: {
-    // provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/YOUR-PROJECT-ID`),
-    // network_id: 3,       // Ropsten's id
-    // gas: 5500000,        // Ropsten has a lower block limit than mainnet
-    // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
-    // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-    // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-    // },
+    mainnet: {
+      provider: () => new HDWalletProvider(ETH_MAIN_PRIVATE_KEYS, `https://mainnet.infura.io/v3/${CONFIG.INFURA_KEY}`),
+      network_id: 1,
+      gasPrice: 20000000000,  // 20 Gwei
+      confirmations: 2,
+      timeoutBlocks: 200,
+    },
+    ropsten: {
+      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://ropsten.infura.io/v3/${CONFIG.INFURA_KEY}`),
+      network_id: 3,       // Ropsten's id
+      // gas: 5500000,        // Ropsten has a lower block limit than mainnet
+      gasPrice: 20000000000,// 20 Gwei
+      // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+    },
     // Useful for private networks
     // private: {
     // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
@@ -92,6 +104,14 @@ module.exports = {
       }
     }
   },
+  
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  
+  api_keys: {
+    etherscan: CONFIG.ETHERSCAN_KEY
+  }
 
   // Truffle DB is currently disabled by default; to enable it, change enabled:
   // false to enabled: true. The default storage location can also be
