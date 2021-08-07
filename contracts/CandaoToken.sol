@@ -21,8 +21,10 @@ contract CandaoToken is ERC20, ERC20Burnable, Pausable, RecoverableFunds {
         _;
     }
     
-    constructor(string memory name, string memory symbol, address initialAccount, uint256 initialBalance) payable ERC20(name, symbol) {
-        _mint(initialAccount, initialBalance);
+    constructor(string memory name, string memory symbol, address[] memory initialAccounts, uint256[] memory initialBalances) payable ERC20(name, symbol) {
+        for(uint8 i = 0; i < initialAccounts.length - 1; i++) {
+            _mint(initialAccounts[i], initialBalances[i]);
+        }
     }
 
     function registerCallback(address callback) public onlyOwner {
