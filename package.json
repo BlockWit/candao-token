@@ -16,6 +16,7 @@
   },
   "homepage": "https://github.com/BlockWit/candao-token#readme",
   "devDependencies": {
+    "@openzeppelin/contracts": "^4.2.0",
     "truffle": "^5.4.5"
   }
 }
