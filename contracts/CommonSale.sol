@@ -17,31 +17,10 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds {
     uint256 public invested;
     uint256 public percentRate = 100;
     address payable public wallet;
-    mapping(address => bool) public whitelist;
 
     mapping(uint256 => mapping(address => uint256)) public balances;
 
     mapping(uint256 => bool) public whitelistedStages;
-
-    function setStageWithWhitelist(uint256 index) public onlyOwner {
-        whitelistedStages[index] = true;
-    }
-
-    function unsetStageWithWhitelist(uint256 index) public onlyOwner {
-        whitelistedStages[index] = false;
-    }
-
-    function addToWhitelist(address[] memory accounts) public onlyOwner {
-        for(uint8 i = 0; i < accounts.length; i++) {
-            whitelist[accounts[i]] = true;
-        }
-    }
-
-    function removeFromWhitelist(address[] memory accounts) public onlyOwner {
-        for(uint8 i = 0; i < accounts.length; i++) {
-            whitelist[accounts[i]] = false;
-        }
-    }
 
     function pause() public onlyOwner {
         _pause();
@@ -75,25 +54,9 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds {
         uint256 stageIndex = getCurrentStageOrRevert();
         
         Stage storage stage = stages[stageIndex];
-        uint256 limitedInvestValue = msg.value;
-
-        // limit the minimum amount for one transaction (ETH) 
-        require(limitedInvestValue >= stage.minInvestedLimit, "CommonSale: The amount is too small");
-
-        // check if the stage requires user to be whitelisted
-        if (whitelistedStages[stageIndex]) {
-            require(whitelist[_msgSender()], "CommonSale: The address must be whitelisted");
-        }
-
-        // limit the maximum amount that one user can spend during the current stage (ETH)
-        uint256 maxAllowableValue = stage.maxInvestedLimit - balances[stageIndex][_msgSender()];
-        if (limitedInvestValue > maxAllowableValue) {
-            limitedInvestValue = maxAllowableValue;
-        }
-        require(limitedInvestValue > 0, "CommonSale: Investment limit exceeded");
 
         // apply a bonus if any (CDO)
-        uint256 tokensWithoutBonus = limitedInvestValue.mul(price).div(1 ether);
+        uint256 tokensWithoutBonus = msg.value.mul(price).div(1 ether);
         uint256 tokensWithBonus = tokensWithoutBonus;
         if (stage.bonus > 0) {
             tokensWithBonus = tokensWithoutBonus.add(tokensWithoutBonus.mul(stage.bonus).div(percentRate));
