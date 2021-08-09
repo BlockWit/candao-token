@@ -2,10 +2,10 @@
 
 # Candao smart contracts
 
-* _Standart_        : ERC20
-* _Name_            : Candao
-* _Ticker_          : CDO
-* _Decimals_        : 18
+* _Standart_        : [ERC20](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md)
+* _[Name](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md#name)_            : Candao
+* _[Ticker](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md#symbol)_          : CDO
+* _[Decimals](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md#decimals)_        : 18
 * _Emission_        : One-time, 1 500 000 000 tokens
 * _Fiat dependency_ : No
 * _Token offers_    : 3
