@@ -2,22 +2,44 @@ const { accounts, contract, web3 } = require('@openzeppelin/test-environment');
 const { balance, BN, constants, ether, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
 const { assert, expect } = require('chai');
 const { ZERO_ADDRESS } = constants;
+const { shouldBehaveLikeERC20 } = require('./behaviors/ERC20.behavior');
+const { shouldBehaveLikeERC20Burnable } = require('./behaviors/ERC20Burnable.behavior');
+const { shouldBehaveLikeRecoverableFunds } = require('./behaviors/RecoverableFunds.behaviour');
 
 const Token = contract.fromArtifact('CandaoToken');
 
-describe('Token', async function () {
+const [account1, account2, account3, account4, account5, account6, account7, account8, owner ] = accounts;
+const SUPPLY1 = ether('400000000');
+const SUPPLY2 = ether('250000000');
+const SUPPLY3 = ether('210000000');
+const SUPPLY4 = ether('200000000');
+const SUPPLY5 = ether('150000000');
+const SUPPLY6 = ether('150000000');
+const SUPPLY7 = ether('100000000');
+const SUPPLY8 = ether('40000000');
+const initialAccounts = [account1, account2, account3, account4, account5, account6, account7, account8];
+const initialBalances = [SUPPLY1, SUPPLY2, SUPPLY3, SUPPLY4, SUPPLY5, SUPPLY6, SUPPLY7, SUPPLY8];
 
-  const [account1, account2, account3, account4, account5, account6, account7, account8, owner ] = accounts;
-  const SUPPLY1 = ether('400000000');
-  const SUPPLY2 = ether('250000000');
-  const SUPPLY3 = ether('210000000');
-  const SUPPLY4 = ether('200000000');
-  const SUPPLY5 = ether('150000000');
-  const SUPPLY6 = ether('150000000');
-  const SUPPLY7 = ether('100000000');
-  const SUPPLY8 = ether('40000000');
-  const initialAccounts = [account1, account2, account3, account4, account5, account6, account7, account8];
-  const initialBalances = [SUPPLY1, SUPPLY2, SUPPLY3, SUPPLY4, SUPPLY5, SUPPLY6, SUPPLY7, SUPPLY8];
+describe('ERC20', function () {
+  
+  beforeEach(async function() {
+    this.token = await Token.new('Candao', 'CDO', [account1], [SUPPLY1], {from: owner});
+  })
+  
+  shouldBehaveLikeERC20("ERC20", SUPPLY1, account1, account2, account3);
+  shouldBehaveLikeERC20Burnable(account1, SUPPLY1, [account2]);
+});
+
+describe('RecoverableFunds', function () {
+  
+  beforeEach(async function() {
+    this.testedContract = await Token.new('Candao', 'CDO', [account1], [SUPPLY1], {from: owner});
+  })
+
+  shouldBehaveLikeRecoverableFunds(owner, account2, account3);
+});
+
+describe('CandaoToken', async function () {
 
   let token;
 
