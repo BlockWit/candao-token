@@ -7,13 +7,13 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "./RecoverableFunds.sol";
 import "./interfaces/ICallbackContract.sol";
+import "./WithCallback.sol";
 
 /**
  * @dev CandaoToken
  */
-contract CandaoToken is ERC20, ERC20Burnable, Pausable, RecoverableFunds {
+contract CandaoToken is ERC20, ERC20Burnable, Pausable, RecoverableFunds, WithCallback {
 
-    address public registeredCallback = address(0x0);
     mapping(address => bool) public whitelist;
 
     modifier notPaused(address account) {
@@ -25,14 +25,6 @@ contract CandaoToken is ERC20, ERC20Burnable, Pausable, RecoverableFunds {
         for(uint8 i = 0; i < initialAccounts.length; i++) {
             _mint(initialAccounts[i], initialBalances[i]);
         }
-    }
-
-    function registerCallback(address callback) public onlyOwner {
-        registeredCallback = callback;
-    }
-
-    function deregisterCallback() public onlyOwner {
-        registeredCallback = address(0x0);
     }
 
     function addToWhitelist(address[] memory accounts) public onlyOwner {
@@ -57,18 +49,12 @@ contract CandaoToken is ERC20, ERC20Burnable, Pausable, RecoverableFunds {
 
     function _burn(address account, uint256 amount) internal override {
         super._burn(account, amount);
-        if (registeredCallback != address(0x0)) {
-            ICallbackContract targetCallback = ICallbackContract(registeredCallback);
-            targetCallback.burnCallback(account, amount);
-        }
+        _burnCallback(account, amount);
     }
 
     function _transfer(address sender, address recipient, uint256 amount) internal override {
         super._transfer(sender, recipient, amount);
-        if (registeredCallback != address(0x0)) {
-            ICallbackContract targetCallback = ICallbackContract(registeredCallback);
-            targetCallback.transferCallback(sender, recipient, amount);
-        }
+        _transferCallback(sender, recipient, amount);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override notPaused(from) {
