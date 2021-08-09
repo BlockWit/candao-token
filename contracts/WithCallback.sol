@@ -16,7 +16,7 @@ contract WithCallback is Ownable {
         registeredCallback = callback;
     }
 
-    function deregisterCallback() public onlyOwner {
+    function unregisterCallback() public onlyOwner {
         registeredCallback = address(0x0);
     }
 
