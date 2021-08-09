@@ -5,6 +5,7 @@ const { ZERO_ADDRESS } = constants;
 const { shouldBehaveLikeERC20 } = require('./behaviors/ERC20.behavior');
 const { shouldBehaveLikeERC20Burnable } = require('./behaviors/ERC20Burnable.behavior');
 const { shouldBehaveLikeRecoverableFunds } = require('./behaviors/RecoverableFunds.behaviour');
+const { shouldBehaveLikeWithCallback } = require('./behaviors/WithCallback.behaviour');
 
 const Token = contract.fromArtifact('CandaoToken');
 
@@ -28,6 +29,8 @@ describe('ERC20', function () {
   
   shouldBehaveLikeERC20("ERC20", SUPPLY1, account1, account2, account3);
   shouldBehaveLikeERC20Burnable(account1, SUPPLY1, [account2]);
+  shouldBehaveLikeWithCallback(owner, account1, account2, account3);
+  
 });
 
 describe('RecoverableFunds', function () {
