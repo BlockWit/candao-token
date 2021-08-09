@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./IERC20Cutted.sol";
+import "./interfaces/IERC20Cutted.sol";
 
 /**
  * @dev Allows the owner to retrieve ETH or tokens sent to this contract by mistake.

@@ -3,8 +3,8 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "./interfaces/IERC20Cutted.sol";
 import "./RecoverableFunds.sol";
-import "./IERC20Cutted.sol";
 import "./StagedCrowdsale.sol";
 import "./CandaoToken.sol";
 
