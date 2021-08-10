@@ -10,12 +10,12 @@ import "./interfaces/IERC20Cutted.sol";
  */
 contract RecoverableFunds is Ownable {
 
-    function retrieveTokens(address recipient, address anotherToken) public onlyOwner() {
+    function retrieveTokens(address recipient, address anotherToken) public virtual onlyOwner {
         IERC20Cutted alienToken = IERC20Cutted(anotherToken);
         alienToken.transfer(recipient, alienToken.balanceOf(address(this)));
     }
 
-    function retriveETH(address payable recipient) public onlyOwner() {
+    function retriveETH(address payable recipient) public virtual onlyOwner {
         recipient.transfer(address(this).balance);
     }
 
