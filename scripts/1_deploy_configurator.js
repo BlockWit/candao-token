@@ -1,12 +1,14 @@
 const Configurator = artifacts.require("Configurator");
+const { logger } = require('./util');
 
 async function deploy() {
+  const log  = logger(await web3.eth.net.getNetworkType());
   const addresses = await web3.eth.getAccounts();
   const [owner] = addresses;
   const configurator = await Configurator.new({ from: owner });
-  console.log(`1. configurator deployed at address: ${configurator.address}`)
-  console.log(`Token address: ${await configurator.token()}`)
-  console.log(`Sale address: ${await configurator.sale()}`)
+  log(`1. configurator deployed at address: @address{${configurator.address}}`);
+  log(`Token address: @token{${await configurator.token()}}`)
+  log(`Sale address: @address{${await configurator.sale()}}`)
 }
 
 module.exports = async function main(callback) {
