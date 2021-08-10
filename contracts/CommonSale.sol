@@ -54,6 +54,9 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds {
         uint256 stageIndex = getCurrentStageOrRevert();
         
         Stage storage stage = stages[stageIndex];
+        
+        // check min investment limit
+        require(msg.value >= stage.minInvestmentLimit, "CommonSale: The amount of ETH you sent is too small.");
 
         // apply a bonus if any (CDO)
         uint256 tokensWithoutBonus = msg.value.mul(price).div(1 ether);

@@ -69,9 +69,9 @@ contract Configurator is RecoverableFunds {
         sale.setToken(address(token));
         sale.setPrice(PRICE);
         sale.setWallet(ETH_WALLET_ADDRESS);
-        sale.addStage(STAGE1_START_DATE, STAGE1_END_DATE, STAGE1_BONUS, 0, 0, STAGE1_TOKEN_HARDCAP);
-        sale.addStage(STAGE2_START_DATE, STAGE2_END_DATE, STAGE2_BONUS, 0, 0, STAGE2_TOKEN_HARDCAP);
-        sale.addStage(STAGE3_START_DATE, STAGE3_END_DATE, STAGE3_BONUS, 0, 0, STAGE3_TOKEN_HARDCAP);
+        sale.addStage(STAGE1_START_DATE, STAGE1_END_DATE, STAGE1_BONUS, 0, 0, 0, STAGE1_TOKEN_HARDCAP);
+        sale.addStage(STAGE2_START_DATE, STAGE2_END_DATE, STAGE2_BONUS, 0, 0, 0, STAGE2_TOKEN_HARDCAP);
+        sale.addStage(STAGE3_START_DATE, STAGE3_END_DATE, STAGE3_BONUS, 0, 0, 0, STAGE3_TOKEN_HARDCAP);
 
         token.transferOwnership(OWNER_ADDRESS);
         sale.transferOwnership(DEPLOYER_ADDRESS);
