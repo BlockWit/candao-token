@@ -6,16 +6,13 @@ async function deploy() {
   const addresses = await web3.eth.getAccounts();
   const [owner] = addresses;
   const configurator = await Configurator.new({ from: owner });
-  log(`1. Configurator deployed at address: @address{${configurator.address}}`);
-  await configurator.step1({ from: owner });
-  log(`2. Step1 complete. CommonSale deployed at address @address{${await configurator.saleAddress()}}`);
-  await configurator.step2({ from: owner });
-  log(`3. Step2 complete. Wallets:`)
+  log(`Configurator deployed at address: @address{${configurator.address}}`);
+  log(`Sale address @address{${await configurator.sale()}}`);
+  log(`Token address: @address{${await configurator.token()}}`)
+  log(`Wallets:`)
   for (let i = 0; i < 5; i++) {
-    log(`@address{${await configurator.walletAddresses(i)}}`)
+    log(`@address{${await configurator.wallets(i)}}`)
   }
-  await configurator.step3({ from: owner });
-  log(`4. step3 complete. Token address: @address{${await configurator.tokenAddress()}}`)
 }
 
 module.exports = async function main(callback) {
