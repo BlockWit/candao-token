@@ -68,13 +68,15 @@ contract Configurator is RecoverableFunds {
         seed2.setStartDate(1629061200000);
         seed2.setDuration(132);
         seed2.setInterval(132);
+        wallets.push(seed2);
         accounts[9] = address(seed2);
-
+        
         // SEED 3 freeze wallet
         FreezeTokenWallet seed3 = new FreezeTokenWallet();
         seed3.setStartDate(1629061200000);
         seed3.setDuration(222);
         seed3.setInterval(222);
+        wallets.push(seed3);
         accounts[10] = address(seed3);
 
         // DAO 1 freeze wallet
@@ -82,13 +84,15 @@ contract Configurator is RecoverableFunds {
         dao1.setStartDate(1629061200000);
         dao1.setDuration(365);
         dao1.setInterval(365);
+        wallets.push(dao1);
         accounts[11] = address(dao1);
 
-        // SEED 3 freeze wallet
+        // FOUNDATION 2 freeze wallet
         FreezeTokenWallet foundation2 = new FreezeTokenWallet();
         foundation2.setStartDate(1629061200000);
         foundation2.setDuration(1826);
         foundation2.setInterval(90);
+        wallets.push(foundation2);
         accounts[12] = address(foundation2);
 
         // MARKETING 1 freeze wallet
@@ -96,6 +100,7 @@ contract Configurator is RecoverableFunds {
         marketing1.setStartDate(1629061200000);
         marketing1.setDuration(730);
         marketing1.setInterval(90);
+        wallets.push(marketing1);
         accounts[13] = address(marketing1);
         
         // create token
@@ -116,8 +121,8 @@ contract Configurator is RecoverableFunds {
         for (uint8 i = 0; i < wallets.length; i++) {
             require(wallets.length == walletOwners.length, "wrong wallet array length");
             wallets[i].setToken(address(token));
-            wallets[i].transferOwnership(walletOwners[i]);
             wallets[i].start();
+            wallets[i].transferOwnership(walletOwners[i]);
         }
         
         // finish sale configuration
