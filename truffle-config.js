@@ -70,12 +70,10 @@ module.exports = {
     },
     ropsten: {
       provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://ropsten.infura.io/v3/${CONFIG.INFURA_KEY}`),
-      network_id: 3,       // Ropsten's id
-      // gas: 5500000,        // Ropsten has a lower block limit than mainnet
-      gasPrice: 20000000000,// 20 Gwei
-      // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
-      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-      skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+      network_id: 3,        // Ropsten's id
+      gasPrice: 2000000000, // 2 Gwei
+      timeoutBlocks: 200,   // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true      // Skip dry run before migrations? (default: false for public nets )
     },
     // Useful for private networks
     // private: {
