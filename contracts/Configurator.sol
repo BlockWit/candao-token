@@ -112,7 +112,7 @@ contract Configurator is RecoverableFunds {
         accounts[13] = address(marketing1);
         
         // create token
-        require(accounts.length == supplies.length, "wrong account array length");
+        require(accounts.length == supplies.length, "Configurator: wrong account array length");
         token = new CandaoToken("Candao", "CDO", accounts, supplies);
         token.pause();
         token.addToWhitelist(whitelist);
@@ -120,7 +120,7 @@ contract Configurator is RecoverableFunds {
         
         // finish wallets configuration
         for (uint8 i = 0; i < wallets.length; i++) {
-            require(wallets.length == walletOwners.length, "wrong wallet array length");
+            require(wallets.length == walletOwners.length, "Configurator: wrong wallet array length");
             wallets[i].setToken(address(token));
             wallets[i].start();
             wallets[i].transferOwnership(walletOwners[i]);
