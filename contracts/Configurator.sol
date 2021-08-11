@@ -25,38 +25,37 @@ contract Configurator is RecoverableFunds {
         uint256 interval;  // days
     }
 
-    address private constant OWNER_ADDRESS      = address(0x05156E01Da01229ebe38aEacfFECeDb146100bF1);
-    address private constant DEPLOYER_ADDRESS   = address(0x299C851896d1740bA10f31c5aE15425bd24c12D5);
+    address private constant OWNER_ADDRESS      = address(0xe084a16766cd408cb41562b5A8a0cA5B6E88aB60);
     address payable constant ETH_WALLET_ADDRESS = payable(0x299C851896d1740bA10f31c5aE15425bd24c12D5);
 
     uint256[] private supplies = [
         // casual eth wallets
-        125000000 * 1 ether, // SEED 1
-        250000000 * 1 ether, // DAO 2
-        210000000 * 1 ether, // CONTENT MINING
-        200000000 * 1 ether, // LIQUIDITY POOL
-        50000000  * 1 ether, // FOUNDATION 1
-        150000000 * 1 ether, // TEAM
-        10000000  * 1 ether, // MARKETING 2
-        40000000  * 1 ether, // ADVISORS
+        20_250_000  ether, // SEED 1
+        250_000_000 ether, // DAO 2
+        210_000_000 ether, // CONTENT MINING
+        200_000_000 ether, // LIQUIDITY POOL
+        50_000_000  ether, // FOUNDATION 1
+        150_000_000 ether, // TEAM
+        10_000_000  ether, // MARKETING 2
+        40_000_000  ether, // ADVISORS
         // auto-generated addresses
-        200000000 * 1 ether, // SALE
-        125000000 * 1 ether, // SEED 2
-        250000000 * 1 ether, // SEED 3
-        150000000 * 1 ether, // DAO 1
-        100000000 * 1 ether, // FOUNDATION 2
-        100000000 * 1 ether  // MARKETING 1
+        169_000_000 ether, // SALE
+        20_250_000  ether, // SEED 2
+        40_500_000  ether, // SEED 3
+        150_000_000 ether, // DAO 1
+        100_000_000 ether, // FOUNDATION 2
+        90_000_000  ether  // MARKETING 1
     ];
-
+    
     address[] private accounts = [
-        0xe084a16766cd408cb41562b5A8a0cA5B6E88aB60, // SEED 1
-        0xe084a16766cd408cb41562b5A8a0cA5B6E88aB60, // DAO 2
-        0x5D6b8030a91a96B0c7D133fD5612022b39a67e2f, // CONTENT MINING
-        0xCd2090Af0c24f8C6E5C8DE4D7B01C48675FAC315, // LIQUIDITY POOL
-        0xc16eE06F206F207341B2A27D6A7368F6D5D21156, // FOUNDATION 1
-        0x819561272D3474Fb6e3f316c2668ec5D2F63dDD5, // TEAM
-        0x19F5D82cb05154881bb00d0C8d9Be309e552f489, // MARKETING 2
-        0x27645c1A856780c98FEc2d973339a724962e9bD2  // ADVISORS
+        0x5D6b8030a91a96B0c7D133fD5612022b39a67e2f, // SEED 1
+        0xCd2090Af0c24f8C6E5C8DE4D7B01C48675FAC315, // DAO 2
+        0xc16eE06F206F207341B2A27D6A7368F6D5D21156, // CONTENT MINING
+        0x819561272D3474Fb6e3f316c2668ec5D2F63dDD5, // LIQUIDITY POOL
+        0x19F5D82cb05154881bb00d0C8d9Be309e552f489, // FOUNDATION 1
+        0x27645c1A856780c98FEc2d973339a724962e9bD2, // TEAM
+        0xdBB6e419c1A377B63dDfe5BB7B0B7636A4B99591, // MARKETING 2
+        0x05156E01Da01229ebe38aEacfFECeDb146100bF1  // ADVISORS
     ];
 
     address public tokenAddress;
@@ -68,14 +67,14 @@ contract Configurator is RecoverableFunds {
     // create sale
     function step1() public onlyOwner {
         require(deploymentStep == 1, "wrong deployment order");
-        uint256 PRICE = 16253;
+        uint256 PRICE = 21674 ether;
         StageParams[6] memory stageParams = [
-            StageParams(1629068400000,1629673200000,700,30000000000000000,18480000),
-            StageParams(1629673200000,1630278000000,434,30000000000000000,27720000),
-            StageParams(1630278000000,1630882800000,300,30000000000000000,37800000),
-            StageParams(1630882800000,1631487600000,100,30000000000000000,18700000),
-            StageParams(1631487600000,1632092400000,34, 30000000000000000,28050000),
-            StageParams(1632092400000,1632697200000,700,30000000000000000,38250000)
+            StageParams(1629068400000, 1629673200000, 500, 30000000000000000, 18480000000000000000000000),
+            StageParams(1629673200000, 1630278000000, 300, 30000000000000000, 27720000000000000000000000),
+            StageParams(1630278000000, 1630882800000, 200, 30000000000000000, 37800000000000000000000000),
+            StageParams(1630882800000, 1631487600000, 50,  30000000000000000, 18700000000000000000000000),
+            StageParams(1631487600000, 1632092400000, 20,  30000000000000000, 28050000000000000000000000),
+            StageParams(1632092400000, 1632697200000, 0,   30000000000000000, 38250000000000000000000000)
         ];
         CommonSale sale = new CommonSale();
         sale.setWallet(ETH_WALLET_ADDRESS);
@@ -93,11 +92,11 @@ contract Configurator is RecoverableFunds {
     function step2() public onlyOwner {
         require(deploymentStep == 2, "wrong deployment order");
         WalletParams[5] memory walletParams = [
-            WalletParams(0xe084a16766cd408cb41562b5A8a0cA5B6E88aB60, 1629061200000, 132, 132), // SEED 2
-            WalletParams(0xe084a16766cd408cb41562b5A8a0cA5B6E88aB60, 1629061200000, 222, 222), // SEED 3
-            WalletParams(0xe084a16766cd408cb41562b5A8a0cA5B6E88aB60, 1629061200000, 365, 365), // DAO 1
-            WalletParams(0x5D6b8030a91a96B0c7D133fD5612022b39a67e2f, 1629061200000, 1826, 90), // FOUNDATION 2
-            WalletParams(0xc16eE06F206F207341B2A27D6A7368F6D5D21156, 1629061200000, 730, 90)   // MARKETING 1
+            WalletParams(0xdb413DA3Dd431D7e7fe639db2C23509ca01e2C1E, 1629061200000, 132, 132), // SEED 2
+            WalletParams(0x52748C07c89813ecFFd54A3398525e0172f5A68c, 1629061200000, 222, 222), // SEED 3
+            WalletParams(0x26c8a8DB6881E549e62312fC63938AE39FAE32E6, 1629061200000, 365, 365), // DAO 1
+            WalletParams(0x3eF3f8975805aF6671104D9BCBDD4865b11111D7, 1629061200000, 1826, 90), // FOUNDATION 2
+            WalletParams(0x39DBA2f245EFC6843B791805A5702E3c1B3fCcEe, 1629061200000, 730, 90)   // MARKETING 1
         ];
         for (uint8 i = 0; i < walletParams.length; i++) {
             FreezeTokenWallet wallet = new FreezeTokenWallet();
