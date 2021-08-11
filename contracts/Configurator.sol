@@ -19,6 +19,7 @@ contract Configurator is RecoverableFunds {
         address payable ETH_WALLET_ADDRESS = payable(0x299C851896d1740bA10f31c5aE15425bd24c12D5);
         
         address[] memory accounts = new address[](14);
+        address[] memory walletOwners = new address[](5);
         uint256[] memory supplies = new uint256[](14);
         address[] memory whitelist = new address[](1);
         
@@ -31,6 +32,13 @@ contract Configurator is RecoverableFunds {
         accounts[5] = 0x27645c1A856780c98FEc2d973339a724962e9bD2; // TEAM
         accounts[6] = 0xdBB6e419c1A377B63dDfe5BB7B0B7636A4B99591; // MARKETING 2
         accounts[7] = 0x05156E01Da01229ebe38aEacfFECeDb146100bF1; // ADVISORS
+
+        // owners of freeze wallets
+        walletOwners[0] = 0xdb413DA3Dd431D7e7fe639db2C23509ca01e2C1E; // SEED 2
+        walletOwners[1] = 0x52748C07c89813ecFFd54A3398525e0172f5A68c; // SEED 3
+        walletOwners[2] = 0x26c8a8DB6881E549e62312fC63938AE39FAE32E6; // DAO 1
+        walletOwners[3] = 0x3eF3f8975805aF6671104D9BCBDD4865b11111D7; // FOUNDATION 2
+        walletOwners[4] = 0x39DBA2f245EFC6843B791805A5702E3c1B3fCcEe;  // MARKETING 1
         
         // supplies for casual eth accounts
         supplies[0]  = 20_250_000  ether; // SEED 1
@@ -111,13 +119,6 @@ contract Configurator is RecoverableFunds {
         token.transferOwnership(OWNER_ADDRESS);
         
         // finish wallets configuration
-        address[5] memory walletOwners = [
-            0xdb413DA3Dd431D7e7fe639db2C23509ca01e2C1E, // SEED 2
-            0x52748C07c89813ecFFd54A3398525e0172f5A68c, // SEED 3
-            0x26c8a8DB6881E549e62312fC63938AE39FAE32E6, // DAO 1
-            0x3eF3f8975805aF6671104D9BCBDD4865b11111D7, // FOUNDATION 2
-            0x39DBA2f245EFC6843B791805A5702E3c1B3fCcEe  // MARKETING 1
-        ];
         for (uint8 i = 0; i < wallets.length; i++) {
             require(wallets.length == walletOwners.length, "wrong wallet array length");
             wallets[i].setToken(address(token));
