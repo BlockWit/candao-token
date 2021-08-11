@@ -7,8 +7,8 @@ async function deploy() {
   const [owner] = addresses;
   const configurator = await Configurator.new({ from: owner });
   log(`1. configurator deployed at address: @address{${configurator.address}}`);
-  log(`Token address: @token{${await configurator.token()}}`)
-  log(`Sale address: @address{${await configurator.sale()}}`)
+  // log(`Token address: @token{${await configurator.token()}}`)
+  // log(`Sale address: @address{${await configurator.sale()}}`)
 }
 
 module.exports = async function main(callback) {
