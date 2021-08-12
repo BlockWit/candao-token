@@ -68,10 +68,19 @@ module.exports = {
       confirmations: 2,
       timeoutBlocks: 200,
     },
+    kovan: {
+      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://kovan.infura.io/v3/${CONFIG.INFURA_KEY}`),
+      network_id: 42,
+      gasPrice: 1000000000, // 1 Gwei
+      gas: 12500000,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
     ropsten: {
       provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://ropsten.infura.io/v3/${CONFIG.INFURA_KEY}`),
-      network_id: 3,        // Ropsten's id
-      gasPrice: 2000000000, // 2 Gwei
+      network_id: 3,
+      gasPrice: 80000000000, // 80 Gwei
+      gas: 8000000,  
       timeoutBlocks: 200,   // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true      // Skip dry run before migrations? (default: false for public nets )
     },
