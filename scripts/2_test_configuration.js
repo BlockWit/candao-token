@@ -8,7 +8,7 @@ const Wallet = artifacts.require("FreezeTokenWallet");
 
 
 async function deploy() {
-  const CONFIGURATOR_ADDRESS = '0x32bF41f1cED16B1314f6cF2EC78E1040fe1EC18F';
+  const CONFIGURATOR_ADDRESS = '';
   const configurator = await Configurator.at(CONFIGURATOR_ADDRESS);
   const SALE_ADDRESS = await configurator.sale();
   const sale = await Sale.at(SALE_ADDRESS);
@@ -28,7 +28,7 @@ async function deploy() {
   await logRevert(async () => {
     log(`CommonSale. Attempting to send Ether to the CommonSale contract before the sale starts. Should revert.`)
     const tx = await web3.eth.sendTransaction({ from: buyer, to: SALE_ADDRESS, value: toWei('0.04', 'ether') });
-    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+    log(`Result: successful tx: @tx{${tx.transactionHash}}`);
   }, (txHash, reason) => {
     log(`Result: Revert with reason "${reason}". @tx{${txHash}}`);
   })
@@ -63,6 +63,51 @@ async function deploy() {
     const tx = await web3.eth.sendTransaction({ from: buyer, to: SALE_ADDRESS, value: toWei('0.03', 'ether'), gas: '200000' });
     log(`Result: successful tx: @tx{${tx.transactionHash}}`);
   })();
+
+  await logRevert(async () => {
+    log(`Token. Attempting to transfer token before it's unpaused. Should revert.`)
+    const balance = await token.balanceOf(buyer);
+    const tx = await token.transfer(anotherAccount, balance, { from: buyer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }, (txHash, reason) => {
+    log(`Result: Revert with reason "${reason}". @tx{${txHash}}`);
+  })
+
+  await logRevert(async () => {
+    log(`Token. Attempting to call "unpause" method from a non-owner account. Should revert.`)
+    const tx = await token.unpause({ from: anotherAccount })
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }, (txHash, reason) => {
+    log(`Result: Revert with reason "${reason}". @tx{${txHash}}`);
+  })
+
+  await (async () => {
+    log(`Token. Unpause.`)
+    const tx = await token.unpause({ from: owner })
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  })();
+
+  await (async () => {
+    log(`Token. Transfer after it's been unpaused from seed2's account.`)
+    const balance = await token.balanceOf(seed2);
+    const tx = await token.transfer(anotherAccount, balance, { from: seed2 });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  })();
+
+  await (async () => {
+    log(`Token. Transfer after it's been unpaused from buyer's account.`)
+    const balance = await token.balanceOf(buyer);
+    const tx = await token.transfer(anotherAccount, balance, { from: buyer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  })();
+
+  await logRevert(async () => {
+    log(`FreezeTokenWallet. Attempting to withdraw tokens ahead of schedule. Should revert.`)
+    const tx = await wallets[0].retrieveWalletTokens(seed2, { from: seed2 });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }, (txHash, reason) => {
+    log(`Result: Revert with reason "${reason}". @tx{${txHash}}`);
+  })
   
 
 }
