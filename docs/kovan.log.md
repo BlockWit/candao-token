@@ -1,16 +1,17 @@
 # KOVAN test log
-Configurator deployed at address: [0xb686d5c0a1483cf582386EB607aDE74a79363B7c](https://kovan.etherscan.io/address/0xb686d5c0a1483cf582386EB607aDE74a79363B7c)
+## Addresses
+* Configurator deployed at address: [0xb686d5c0a1483cf582386EB607aDE74a79363B7c](https://kovan.etherscan.io/address/0xb686d5c0a1483cf582386EB607aDE74a79363B7c)
+* Sale address [0x5c09A0c9D197a9178f5e254F1975228e5709aBBC](https://kovan.etherscan.io/address/0x5c09A0c9D197a9178f5e254F1975228e5709aBBC)
+* Token address: [0x9C82fC6091599928d0Fa998e181EeCb4562f9857](https://kovan.etherscan.io/address/0x9C82fC6091599928d0Fa998e181EeCb4562f9857)
 
-Sale address [0x5c09A0c9D197a9178f5e254F1975228e5709aBBC](https://kovan.etherscan.io/address/0x5c09A0c9D197a9178f5e254F1975228e5709aBBC)
+* Wallets:
+    * [SEED 2](https://kovan.etherscan.io/address/0x0aC2F917aa917B31AC74A06dC2EfE0Ba44cbF053)
+    * [SEED 3](https://kovan.etherscan.io/address/0x0c3BA9CDA61e7198d6959359F44BCdD696182872)
+    * [DAO 1](https://kovan.etherscan.io/address/0x336329E87Ca6d6e1FB856426E7797fe706af3e2E)
+    * [FOUNDATION 2](https://kovan.etherscan.io/address/0x473c0B1D8c9cF64cE685F62d26b5d9aBC9Bf84a8)
+    * [MARKETING 1](https://kovan.etherscan.io/address/0x96BeBBb89a61a75812226d21da790f5ce4A205B6)
 
-Token address: [0x9C82fC6091599928d0Fa998e181EeCb4562f9857](https://kovan.etherscan.io/address/0x9C82fC6091599928d0Fa998e181EeCb4562f9857)
-
-Wallets:
-* [SEED 2](https://kovan.etherscan.io/address/0x0aC2F917aa917B31AC74A06dC2EfE0Ba44cbF053)
-* [SEED 3](https://kovan.etherscan.io/address/0x0c3BA9CDA61e7198d6959359F44BCdD696182872)
-* [DAO 1](https://kovan.etherscan.io/address/0x336329E87Ca6d6e1FB856426E7797fe706af3e2E)
-* [FOUNDATION 2](https://kovan.etherscan.io/address/0x473c0B1D8c9cF64cE685F62d26b5d9aBC9Bf84a8)
-* [MARKETING 1](https://kovan.etherscan.io/address/0x96BeBBb89a61a75812226d21da790f5ce4A205B6)
+## Test actions
 
 1. CommonSale. Attempting to send Ether to the CommonSale contract before the sale starts. Should revert.  
     Result: [Revert with reason "StagedCrowdsale: No suitable stage found"](https://kovan.etherscan.io/tx/0xc8ec78acda4ae7eabe517065150cb669115da1e77b88d80d4697d2212e3ef66e)
