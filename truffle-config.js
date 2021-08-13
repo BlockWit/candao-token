@@ -21,7 +21,7 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const CONFIG = require('dotenv').config().parsed;
 const ETH_MAIN_PRIVATE_KEYS = JSON.parse(CONFIG.ETH_MAIN_PRIVATE_KEYS);
-const ETH_TEST_PRIVATE_KEYS = JSON.parse(CONFIG.ETH_TEST_PRIVATE_KEYS);
+const ETH_TEST_MNEMONIC = CONFIG.ETH_TEST_MNEMONIC;
 
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
@@ -69,7 +69,7 @@ module.exports = {
       timeoutBlocks: 200,
     },
     kovan: {
-      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://kovan.infura.io/v3/${CONFIG.INFURA_KEY}`),
+      provider: () => new HDWalletProvider(ETH_TEST_MNEMONIC, `https://kovan.infura.io/v3/${CONFIG.INFURA_KEY}`, 0, 20),
       network_id: 42,
       gasPrice: 1000000000, // 1 Gwei
       gas: 12500000,
@@ -77,7 +77,7 @@ module.exports = {
       skipDryRun: true
     },
     ropsten: {
-      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://ropsten.infura.io/v3/${CONFIG.INFURA_KEY}`),
+      provider: () => new HDWalletProvider(ETH_TEST_MNEMONIC, `https://ropsten.infura.io/v3/${CONFIG.INFURA_KEY}`, 0, 20),
       network_id: 3,
       gasPrice: 80000000000, // 80 Gwei
       gas: 8000000,  
