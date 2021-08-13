@@ -83,6 +83,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds {
         balances[stageIndex][_msgSender()] = balances[stageIndex][_msgSender()].add(tokenBasedLimitedInvestValue);
         
         wallet.transfer(tokenBasedLimitedInvestValue);
+        token.transfer(_msgSender(), tokensWithBonus);
         
         if (change > 0) {
             payable(_msgSender()).transfer(change);
