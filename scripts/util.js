@@ -22,8 +22,17 @@ function logger(network) {
     try {
       await tryBlock();
     } catch (e) {
-      const txHash = Object.keys(e.data)[0]
-      const reason = e.data[txHash].reason
+      let txHash, reason;
+      if (Object.keys(e).includes('receipt')) {
+        txHash = e.receipt.transactionHash;
+      }
+      if (Object.keys(e).includes('reason')) {
+        reason = e.reason;
+      }
+      if (!txHash && !reason) try {
+        txHash = Object.keys(e.data)[0]
+        reason = e.data[txHash].reason
+      } finally {}
       catchBlock(txHash, reason);
     }
   }
