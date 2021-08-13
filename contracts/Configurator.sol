@@ -62,18 +62,18 @@ contract Configurator is RecoverableFunds {
         sale = new CommonSale();
         sale.setWallet(ETH_WALLET_ADDRESS);
         sale.setPrice(21674 ether);
-        sale.addStage(1629068400000, 1629673200000, 500, 30000000000000000, 0, 0, 18480000000000000000000000);
-        sale.addStage(1629673200000, 1630278000000, 300, 30000000000000000, 0, 0, 27720000000000000000000000);
-        sale.addStage(1630278000000, 1630882800000, 200, 30000000000000000, 0, 0, 37800000000000000000000000);
-        sale.addStage(1630882800000, 1631487600000, 50,  30000000000000000, 0, 0, 18700000000000000000000000);
-        sale.addStage(1631487600000, 1632092400000, 20,  30000000000000000, 0, 0, 28050000000000000000000000);
-        sale.addStage(1632092400000, 1632697200000, 0,   30000000000000000, 0, 0, 38250000000000000000000000);
+        sale.addStage(1629068400, 1629673200, 500, 30000000000000000, 0, 0, 18480000000000000000000000);
+        sale.addStage(1629673200, 1630278000, 300, 30000000000000000, 0, 0, 27720000000000000000000000);
+        sale.addStage(1630278000, 1630882800, 200, 30000000000000000, 0, 0, 37800000000000000000000000);
+        sale.addStage(1630882800, 1631487600, 50,  30000000000000000, 0, 0, 18700000000000000000000000);
+        sale.addStage(1631487600, 1632092400, 20,  30000000000000000, 0, 0, 28050000000000000000000000);
+        sale.addStage(1632092400, 1632697200, 0,   30000000000000000, 0, 0, 38250000000000000000000000);
         accounts[8] = address(sale);
         whitelist[0] = address(sale);
 
         // SEED 2 freeze wallet
         FreezeTokenWallet seed2 = new FreezeTokenWallet();
-        seed2.setStartDate(1629061200000);
+        seed2.setStartDate(1629061200);
         seed2.setDuration(132);
         seed2.setInterval(132);
         wallets.push(seed2);
@@ -81,7 +81,7 @@ contract Configurator is RecoverableFunds {
         
         // SEED 3 freeze wallet
         FreezeTokenWallet seed3 = new FreezeTokenWallet();
-        seed3.setStartDate(1629061200000);
+        seed3.setStartDate(1629061200);
         seed3.setDuration(222);
         seed3.setInterval(222);
         wallets.push(seed3);
@@ -89,7 +89,7 @@ contract Configurator is RecoverableFunds {
 
         // DAO 1 freeze wallet
         FreezeTokenWallet dao1 = new FreezeTokenWallet();
-        dao1.setStartDate(1629061200000);
+        dao1.setStartDate(1629061200);
         dao1.setDuration(365);
         dao1.setInterval(365);
         wallets.push(dao1);
@@ -97,7 +97,7 @@ contract Configurator is RecoverableFunds {
 
         // FOUNDATION 2 freeze wallet
         FreezeTokenWallet foundation2 = new FreezeTokenWallet();
-        foundation2.setStartDate(1629061200000);
+        foundation2.setStartDate(1629061200);
         foundation2.setDuration(1826);
         foundation2.setInterval(90);
         wallets.push(foundation2);
@@ -105,7 +105,7 @@ contract Configurator is RecoverableFunds {
 
         // MARKETING 1 freeze wallet
         FreezeTokenWallet marketing1 = new FreezeTokenWallet();
-        marketing1.setStartDate(1629061200000);
+        marketing1.setStartDate(1629061200);
         marketing1.setDuration(730);
         marketing1.setInterval(90);
         wallets.push(marketing1);
