@@ -15,8 +15,8 @@ contract Configurator is RecoverableFunds {
     FreezeTokenWallet[] public wallets;
     
     constructor() {
-        address         OWNER_ADDRESS      = address(0x4Cc2093B1170ECD7715319C2112bAcBb74F35d4C);
-        address payable ETH_WALLET_ADDRESS = payable(0xA7b373baefD2af7091B0fD61183d0d15d5cf7683);
+        address         OWNER_ADDRESS      = address(0x0b2cBc8a2D434dc16818B0664Dd81e89fAA9c3AC);
+        address payable ETH_WALLET_ADDRESS = payable(0xf83c2172950d2Cc6490F164bb08F2381C2CdEc82);
         
         address[] memory accounts = new address[](14);
         address[] memory walletOwners = new address[](5);
@@ -24,21 +24,21 @@ contract Configurator is RecoverableFunds {
         address[] memory whitelist = new address[](1);
         
         // casual eth accounts
-        accounts[0] = 0x346060608839A703AB478e0433807EC8e8D0D990; // SEED 1
-        accounts[1] = 0x9037Cb32705CeB0E66a8C0f27Fee3E16bddBa490; // DAO 2
-        accounts[2] = 0x54EFd45a0d309561DaAeCB44Bc03b37488a795d3; // CONTENT MINING
-        accounts[3] = 0x6e6A3F074A79216E92A8Bb8575b8dd4d0d2153Dd; // LIQUIDITY POOL
-        accounts[4] = 0x92671CdA65721229C7b7C8682761e4e63cd2E653; // FOUNDATION 1
-        accounts[5] = 0xA13b3C5d83d964afbA6Ad54b5D4C1Dc5Fedc7aEe; // TEAM
-        accounts[6] = 0xe81d33ed9aB8dC64E58b89A182F45db67790920F; // MARKETING 2
-        accounts[7] = 0x2128e74CE1b188031B260321ddACFa2Febc75916; // ADVISORS
+        accounts[0] = 0x43Fa4fb5Fd9365242c0215C73B863aEE98128A7e; // SEED 1
+        accounts[1] = 0xe74b3Ba0e474eA8EE89da99Ef38889ED229e8782; // DAO 2
+        accounts[2] = 0x539e3b4Cf63685cB2aE9adA4414335EB0B496Aec; // CONTENT MINING
+        accounts[3] = 0xe6Df6C96794063F2cC1Dc338908B2a04Ff29eBd4; // LIQUIDITY POOL
+        accounts[4] = 0x3aCe47351C48a4971b62176Ef3538C51397a0d5E; // FOUNDATION 1
+        accounts[5] = 0x5219Cc08E635e9764c8014D984d60Fb7Ed200EEB; // TEAM
+        accounts[6] = 0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71; // MARKETING 2
+        accounts[7] = 0x05422B2b38ec652384F1b9dFA3487B2eeA58B544; // ADVISORS
 
         // owners of freeze wallets
-        walletOwners[0] = 0xFb760925724A37C5afd524Deee873592A9EFcFB9; // SEED 2
-        walletOwners[1] = 0xd168154FFbFbed411423b03bd406383dcF358fc9; // SEED 3
-        walletOwners[2] = 0x5C338b684e78998Db78c1F8C98F50BDF271931e9; // DAO 1
-        walletOwners[3] = 0x76DB0aDaADb296aB2Ceb2f566E78CD102F78B07e; // FOUNDATION 2
-        walletOwners[4] = 0x2a68cD52038e3E6cEb2efE6e05644228CB77D9aE;  // MARKETING 1
+        walletOwners[0] = 0x6A7770781F385395FF61Ae270f14Bd86394Af758; // SEED 2
+        walletOwners[1] = 0x07eaFAea0061aB387C745fCCF10829c6E6cA21BD; // SEED 3
+        walletOwners[2] = 0x469E58184BE25216d67d3654E0391437a31507d8; // DAO 1
+        walletOwners[3] = 0xb014C01d196B3e2f95bEe8Fc59189928F7B547FE; // FOUNDATION 2
+        walletOwners[4] = 0x656f76dd339345d77932Df5b3db1E64A4D9AF971;  // MARKETING 1
         
         // supplies for casual eth accounts
         supplies[0]  = 20_250_000  ether; // SEED 1
