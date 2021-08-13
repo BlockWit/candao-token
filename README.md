@@ -8,7 +8,7 @@
 * _[Decimals](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md#decimals)_        : 18
 * _Emission_        : One-time, 1 500 000 000 tokens
 * _Fiat dependency_ : No
-* _Token offers_    : 3
+* _Token offers_    : 2
 * _Token locks_     : Yes
 
 ## Smart contracts description
@@ -68,41 +68,29 @@ EXODUS does not support ERC20, but provides the ability to export the private ke
 * [Sale](https://etherscan.io)
 
 ### Sale stages
-#### Stage 1: "Seed"
-* Minimum purchase volume           : 
-* Maximum purchase volume           : 
-* Bonus                             : 
-* HardCap                           : 50 000 000 CDO
-* Start date                        : 
-* End date                          : 
+#### Stage 1: "Private Sale"
+* Price                             : 21564 CDO per ETH
+* Minimum purchase volume           : 0,03 ETH
+* HardCap                           : 84 000 000 CDO
+* Start date                        : Aug 16 00:00:00 2021 GMT+0100
+* End date                          : Sep 06 00:00:00 2021 GMT+0100
+* Bonuses                           :
+    * Aug 16 00:00:00 2021 GMT+0100	- Aug 23 00:00:00 2021 GMT+0100: 500%
+    * Aug 23 00:00:00 2021 GMT+0100	- Aug 30 00:00:00 2021 GMT+0100: 300%
+    * Aug 30 00:00:00 2021 GMT+0100	- Sep 06 00:00:00 2021 GMT+0100: 200%
 
-#### Stage 2: "Private Sale"
-* Minimum purchase volume           :
-* Maximum purchase volume           :
-* Bonus                             :
-* HardCap                           : 100 000 000 CDO
-* Start date                        :
-* End date                          :
+ 
+#### Stage 2: "Public Sale"
+* Price                             : 21564 CDO per ETH
+* Minimum purchase volume           : 0,03 ETH
+* HardCap                           : 85 000 000 CDO
+* Start date                        : Sep 06 00:00:00 2021 GMT+0100
+* End date                          : Sep 20 00:00:00 2021 GMT+0100
+* Bonuses                           :
+    * Sep 06 00:00:00 2021 GMT+0100	- Sep 13 00:00:00 2021 GMT+0100: 50%
+    * Sep 13 00:00:00 2021 GMT+0100	- Sep 20 00:00:00 2021 GMT+0100: 20%
+    * Sep 20 00:00:00 2021 GMT+0100	- Sep 27 00:00:00 2021 GMT+0100: 0%
 
-#### Stage 1: "Public Sale"
-* Minimum purchase volume           :
-* Maximum purchase volume           :
-* Bonus                             :
-* HardCap                           : 100 000 000 CDO
-* Start date                        :
-* End date                          :
+## Test network configuration (Kovan)
+You can find kovan test log [here](docs/kovan.log.md)
 
-## Test network configuration (Ropsten)
-### Contracts
-* [Configurator](https://etherscan.io)
-* [CandaoToken](https://etherscan.io)
-* [Sale](https://etherscan.io)
-
-### Sale stages
-#### Stage 1
-* Minimum purchase volume           :
-* Maximum purchase volume           :
-* Bonus                             :
-* HardCap                           :
-* Start date                        :
-* End date                          : 
