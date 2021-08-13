@@ -2,7 +2,7 @@ const Configurator = artifacts.require("Configurator");
 const { logger } = require('./util');
 
 async function deploy() {
-  const log  = logger(await web3.eth.net.getNetworkType());
+  const { log } = logger(await web3.eth.net.getNetworkType());
   const addresses = await web3.eth.getAccounts();
   const [owner] = addresses;
   const configurator = await Configurator.new({ from: owner });
