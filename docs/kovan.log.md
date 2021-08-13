@@ -34,3 +34,9 @@ Wallets:
     Result: [successful tx](https://kovan.etherscan.io/tx/0xf29a8f7499b6d5ff5b642f777df8e93de39ef90ee6cd7927a0213b1066dbe574)
 11. FreezeTokenWallet. Attempting to withdraw tokens ahead of schedule. Should revert.  
     Result: [Revert with reason "Freezing period has not started yet"](https://kovan.etherscan.io/tx/0x4db4291720f7827eabd788c2a76bc3c4ef28e9d79d2216d29a265e2bea24195a)
+12. CommonSale. Send 0.1 Eth from deployer's account.  
+   Result: [successful tx](https://kovan.etherscan.io/tx/0xca1662be70c91fdb7821d0c0fe98999bd5b305472882f6a99330675333dee5bb)
+12. CommonSale. Set the price at 21453.  
+    Result: [successful tx](https://kovan.etherscan.io/tx/0x4901a3efd46ba2cdbe621d80ad1100c62f284c6c3547bf3012c24143cde43b6c)
+12. CommonSale. Send 0.1 Eth from deployer's account after price's been changed.  
+    Result: [successful tx](https://kovan.etherscan.io/tx/0x6960e31257b856b473ef54800b4f17a545a734b295409b6029be387238ce67e4)
