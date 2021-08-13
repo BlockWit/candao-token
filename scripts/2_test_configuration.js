@@ -27,7 +27,7 @@ async function deploy() {
   
   await logRevert(async () => {
     log(`CommonSale. Attempting to send Ether to the CommonSale contract before the sale starts. Should revert.`)
-    const tx = await web3.eth.sendTransaction({ from: buyer, to: SALE_ADDRESS, value: toWei('0.04', 'ether') });
+    const tx = await web3.eth.sendTransaction({ from: buyer, to: SALE_ADDRESS, value: toWei('0.04', 'ether'), gas: '200000' });
     log(`Result: successful tx: @tx{${tx.transactionHash}}`);
   }, (txHash, reason) => {
     log(`Result: Revert with reason "${reason}". @tx{${txHash}}`);
@@ -36,7 +36,6 @@ async function deploy() {
   await logRevert(async () => {
     log(`CommonSale. Attempting to call "updateStage" method from a non-owner account. Should revert.`)
     const startTime = Math.floor(Date.now() / 1000).toString();
-    console.log(startTime)
     const tx = await sale.updateStage(0, startTime, '1629673200', '500', '30000000000000000', '18480000000000000000000000', { from: buyer })
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }, (txHash, reason) => {
@@ -52,7 +51,7 @@ async function deploy() {
 
   await logRevert(async () => {
     log(`CommonSale. Attempting to send less than the allowed amount of Eth. Should revert.`)
-    const tx = await web3.eth.sendTransaction({ from: buyer, to: SALE_ADDRESS, value: toWei('0.02', 'ether') });
+    const tx = await web3.eth.sendTransaction({ from: buyer, to: SALE_ADDRESS, value: toWei('0.02', 'ether'), gas: '200000' });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }, (txHash, reason) => {
     log(`Result: Revert with reason "${reason}". @tx{${txHash}}`);
