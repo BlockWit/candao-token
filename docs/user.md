@@ -128,3 +128,30 @@ To add tokens to your wallet, you need the following information:
 * Token Contract Address - **[wip](https://etherscan.io/token/)**
 * Token Symbol — **CDO**
 * Decimals — **18**
+1. Open your MetaMask wallet, navigate to "Assets" tab and click "Add Token" button.
+    <details><summary>Click to see screenshot</summary>
+
+    ![buying_tokens_01](images/adding_new_token_01.png)
+
+    </details><br>
+
+2. Fill in the field `Token Contract Address`. Metamask will fill in the `Token Symbol` and the `Token Decimals` for you.
+    <details><summary>Click to see screenshot</summary>
+
+   ![buying_tokens_01](images/adding_new_token_02.png)
+
+    </details><br>
+
+3. Click `Add Tokens` on the next screen.
+    <details><summary>Click to see screenshot</summary>
+
+   ![buying_tokens_02](images/adding_new_token_03.png)
+
+    </details><br>
+
+4. You can now monitor your CDO balance and transfer token directly from MetaMask.
+    <details><summary>Click to see screenshot</summary>
+
+   ![buying_tokens_03](images/adding_new_token_04.png)
+
+    </details><br>
