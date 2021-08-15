@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Candao smart contracts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "md-pdf-manager": "cd ./docs && sed -r 's/<details>/<details open>/; s/<summary.+summary>//' manager.md > manager_print.md && md-to-pdf manager_print.md && mv manager_print.pdf manager.pdf && rm manager_print.md",
+    "md-pdf-user": "cd ./docs && sed -r 's/<details>/<details open>/; s/<summary.+summary>//' user.md > user_print.md && md-to-pdf user_print.md && mv user_print.pdf user.pdf && rm user_print.md",
+    "md-pdf": "npm run md-pdf-manager && npm run md-pdf-user"
   },
   "repository": {
     "type": "git",
@@ -30,6 +32,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0",
+    "md-to-pdf": "^4.0.0",
     "mocha": "^9.0.3",
     "solhint": "^3.3.6",
     "truffle": "^5.4.5",
