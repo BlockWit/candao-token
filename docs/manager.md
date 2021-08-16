@@ -6,10 +6,11 @@
 ### Table of contents
 * [Overview](#overview)
 * [Obtaining the ABI interface](#obtaining-the-abi-interface)
-* [Calling function](#calling-function)
-* [How to whitelist addresses](#how-to-whitelist-addresses)
-* [How to withdraw tokens from freezeWallet](#how-to-withdraw-tokens-from-freezewallet)
 * [How to read contract information using Etherscan](#how-to-read-contract-information-using-etherscan)
+* [Calling function](#calling-function)
+* [How to set price in the CommonSale smart contract](#How-to-set-price-in-the-CommonSale-smart-contract)
+* [How to update stage parameters in the CommonSale smart contract](#How-to-update-stage-parameters-in-the-CommonSale-smart-contract)
+* [How to withdraw tokens from freezeWallet](#how-to-withdraw-tokens-from-freezewallet)
 
 ## Overview
 Interaction with the smart contract is provided by calling smart contract functions with parameters.  
