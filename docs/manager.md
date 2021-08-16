@@ -10,6 +10,7 @@
 * [Calling function](#calling-function)
 * [How to set price in the CommonSale smart contract](#How-to-set-price-in-the-CommonSale-smart-contract)
 * [How to update stage parameters in the CommonSale smart contract](#How-to-update-stage-parameters-in-the-CommonSale-smart-contract)
+* [How to unlock token transfer](#How-to-unlock-token-transfer)
 * [How to withdraw tokens from freezeWallet](#how-to-withdraw-tokens-from-freezewallet)
 
 ## Overview
@@ -146,7 +147,7 @@ We use this mechanism to prevent the transfer of token during the sale. When the
 2. Click `Write` button and then click `Confirm` button, as described in step 7 of the [Calling function](#calling-function) section.
     <details><summary>Click to see screenshot</summary>
 
-   ![updating_stages_01](images/unpause_token.png)
+   ![unpause_token](images/unpause_token.png)
 
     </details>
 
