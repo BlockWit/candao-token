@@ -139,6 +139,16 @@ The value in columns `O`-`T` are automatically calculated from values set in col
 
 3. Click `Write` button and then click `Confirm` button, as described in step 7 of the [Calling function](#calling-function) section.
 
+## How to unlock token transfer
+CandaoToken inherits from OpenZeppelin's Pausable, which implements an emergency stop mechanism that can be triggered by an authorized account.
+We use this mechanism to prevent the transfer of token during the sale. When the sale is complete, call `unpause` function of CandaoToken smart contract.
+1. Follow steps 1-6 of the [Calling function](#calling-function) section.
+2. Click `Write` button and then click `Confirm` button, as described in step 7 of the [Calling function](#calling-function) section.
+    <details><summary>Click to see screenshot</summary>
+
+   ![updating_stages_01](images/unpause_token.png)
+
+    </details>
 
 ## How to withdraw tokens from freezeWallet
 The FreezeWallet contract makes tokens available for withdrawal according to schedule described in `Wallets` tab of `Candao` spreadsheet.
