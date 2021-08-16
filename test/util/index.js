@@ -1,3 +1,4 @@
+const { time } = require('@openzeppelin/test-helpers');
 // This decodes logs for a single event type, and returns a decoded object in
 // the same form truffle-contract uses on its receipts
 // This function is a part of '@openzeppelin/test-helpers'
@@ -38,6 +39,24 @@ function decodeLogs (logs, emitter, eventName, web3) {
     .map(decoded => ({ event: eventName, args: decoded }));
 }
 
+/**
+ * Calculates the date that occurs exactly X days from now
+ * @param days - number of days from current date
+ * @returns {number} - Unix TimeStamp in seconds
+ */
+async function dateFromNow(days) {
+  return (await time.latest()).addn(days * 24 * 3600).toNumber()
+}
+
+/**
+ * Increases ganache time if possible
+ * @param timestamp
+ * @returns {Promise<void>}
+ */
+async function increaseDateTo(timestamp) {
+  if (await time.latest() < timestamp) await time.increaseTo(timestamp)
+}
+
 function isWeb3Contract (contract) {
   return 'options' in contract && typeof contract.options === 'object';
 }
@@ -51,6 +70,9 @@ async function getEvents (txHash, emitter, eventName, web3) {
   return decodeLogs(receipt.logs, emitter, eventName, web3);
 }
 
+
 module.exports = {
-  getEvents
+  getEvents,
+  dateFromNow,
+  increaseDateTo
 }
