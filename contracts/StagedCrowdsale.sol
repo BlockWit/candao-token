@@ -35,6 +35,7 @@ contract StagedCrowdsale is Ownable {
         for (uint8 i = index; i < stages.length - 1; i++) {
             stages[i] = stages[i + 1];
         }
+        delete stages[stages.length - 1];
     }
 
     function updateStage(uint8 index, uint256 start, uint256 end, uint256 bonus, uint256 minInvestmentLimit, uint256 hardcapInTokens) public onlyOwner {
