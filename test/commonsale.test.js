@@ -19,7 +19,8 @@ describe('CommonSale', async function () {
   beforeEach(async function () {
     STAGES = [
       { start: await dateFromNow(1), end: await dateFromNow(8), bonus: 500, minInvestmentLimit: ether('0.03'), hardcap: ether('40000') },
-      { start: await dateFromNow(9), end: await dateFromNow(11), bonus: 0, minInvestmentLimit: ether('0.03'), hardcap: ether('60000') }
+      { start: await dateFromNow(9), end: await dateFromNow(11), bonus: 0, minInvestmentLimit: ether('0.03'), hardcap: ether('60000') },
+      { start: await dateFromNow(11), end: await dateFromNow(13), bonus: 250, minInvestmentLimit: ether('0.03'), hardcap: ether('5000') }
     ];
     sale = await Sale.new() ;
     token = await Token.new("Candao", "CDO", [await sale.address], [ether(String(SUPPLY))]);
@@ -96,4 +97,32 @@ describe('CommonSale', async function () {
     expect(tokensReceived).to.be.bignumber.equal(tokensExpected);
   });
 
+  it('should remove stage by index correctly', async function () {
+    await sale.removeStage(1, {from: owner});
+    const stage0 = await sale.stages(0);
+    const stage1 = await sale.stages(1);
+    const stage2 = await sale.stages(2);
+    expectStagesToBeEqual(stage0, STAGES[0]);
+    expectStagesToBeEqual(stage1, STAGES[2]);
+    expectStagesToBeEqual(stage2, { start: 0, end: 0, bonus: 0, minInvestmentLimit: ether('0'), hardcap: ether('0')});
+  });
+
+  it('should remove all stages correctly', async function () {
+    await sale.deleteStages({from: owner});
+    const stage0 = await sale.stages(0);
+    const stage1 = await sale.stages(1);
+    const stage2 = await sale.stages(2);
+    expectStagesToBeEqual(stage0, { start: 0, end: 0, bonus: 0, minInvestmentLimit: ether('0'), hardcap: ether('0')});
+    expectStagesToBeEqual(stage1, { start: 0, end: 0, bonus: 0, minInvestmentLimit: ether('0'), hardcap: ether('0')});
+    expectStagesToBeEqual(stage2, { start: 0, end: 0, bonus: 0, minInvestmentLimit: ether('0'), hardcap: ether('0')});
+  });
+
 });
+
+function expectStagesToBeEqual(actual, expected) {
+  expect(actual.start).to.be.bignumber.equal(new BN(expected.start));
+  expect(actual.end).to.be.bignumber.equal(new BN(expected.end));
+  expect(actual.bonus).to.be.bignumber.equal(new BN(expected.bonus));
+  expect(actual.minInvestmentLimit).to.be.bignumber.equal(expected.minInvestmentLimit);
+  expect(actual.hardcapInTokens).to.be.bignumber.equal(expected.hardcap);
+}
