@@ -42,7 +42,7 @@ function decodeLogs (logs, emitter, eventName, web3) {
 /**
  * Calculates the date that occurs exactly X days from now
  * @param days - number of days from current date
- * @returns {number} - Unix TimeStamp in seconds
+ * @returns {promise} - Unix TimeStamp in seconds
  */
 async function dateFromNow(days) {
   return (await time.latest()).addn(days * 24 * 3600).toNumber()
