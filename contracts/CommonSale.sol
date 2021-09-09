@@ -7,8 +7,9 @@ import "./interfaces/IERC20Cutted.sol";
 import "./RecoverableFunds.sol";
 import "./StagedCrowdsale.sol";
 import "./CandaoToken.sol";
+import "./InputAddress.sol";
 
-contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds {
+contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress {
     
     using SafeMath for uint256;
 
@@ -18,7 +19,8 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds {
     uint256 public percentRate = 100;
     address payable public wallet;
 
-    mapping(address => uint256) public balances;
+    mapping(address => uint256) public balancesCDO;
+    mapping(address => uint256) public balancesETH;
 
     function pause() public onlyOwner {
         _pause();
@@ -47,22 +49,14 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds {
     function updateInvested(uint256 value) internal {
         invested = invested.add(value);
     }
-
-    function internalFallback() internal whenNotPaused returns (uint) {
-        uint256 stageIndex = getCurrentStageOrRevert();
-        
-        Stage storage stage = stages[stageIndex];
-        
-        // check min investment limit
-        require(msg.value >= stage.minInvestmentLimit, "CommonSale: The amount of ETH you sent is too small.");
-
+    
+    function calculateAmounts(Stage memory stage) internal view returns (uint256, uint256) {
         // apply a bonus if any (CDO)
         uint256 tokensWithoutBonus = msg.value.mul(price).div(1 ether);
         uint256 tokensWithBonus = tokensWithoutBonus;
         if (stage.bonus > 0) {
             tokensWithBonus = tokensWithoutBonus.add(tokensWithoutBonus.mul(stage.bonus).div(percentRate));
         }
-
         // limit the number of tokens that user can buy according to the hardcap of the current stage (CDO)
         if (stage.tokensSold.add(tokensWithBonus) > stage.hardcapInTokens) {
             tokensWithBonus = stage.hardcapInTokens.sub(stage.tokensSold);
@@ -70,28 +64,46 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds {
                 tokensWithoutBonus = tokensWithBonus.mul(percentRate).div(percentRate + stage.bonus);
             }
         }
+        // calculate the resulting amount of ETH that user will spend
+        uint256 tokenBasedLimitedInvestValue = tokensWithoutBonus.mul(1 ether).div(price); 
+        // return the number of purchasesd tokens and spent ETH
+        return (tokensWithBonus, tokenBasedLimitedInvestValue);
+    }
+
+    function buyWithCDOReferral() internal whenNotPaused returns (uint256) {
+        uint256 stageIndex = getCurrentStageOrRevert();
+        Stage storage stage = stages[stageIndex];
         
-        // calculate the resulting amount of ETH that user will spend and calculate the change if any
-        uint256 tokenBasedLimitedInvestValue = tokensWithoutBonus.mul(1 ether).div(price);
-        uint256 change = msg.value.sub(tokenBasedLimitedInvestValue);
+        // check min investment limit
+        require(msg.value >= stage.minInvestmentLimit, "CommonSale: The amount of ETH you sent is too small.");
+
+        (uint256 tokens, uint256 investment) = calculateAmounts(stage);
+        uint256 change = msg.value.sub(investment);
 
         // update stats
-        invested = invested.add(tokenBasedLimitedInvestValue);
-        stage.tokensSold = stage.tokensSold.add(tokensWithBonus);
-        balances[_msgSender()] = balances[_msgSender()].add(tokenBasedLimitedInvestValue);
+        invested = invested.add(investment);
+        stage.tokensSold = stage.tokensSold.add(tokens);
+        balancesCDO[_msgSender()] = balancesCDO[_msgSender()].add(tokens);
+
+        address referral = getInputAddress();
+        if (referral != address(0)) {
+            require(referral != address(token) && referral != msg.sender && referral != address(this), "CommonSale: Incorrect referre address.");
+            uint256 referralTokens = tokens.mul(stage.refCDOPercent).div(percentRate);
+            balancesCDO[referral] = balancesCDO[referral].add(referralTokens);
+            stage.refCDOAccrued = stage.refCDOAccrued.add(referralTokens);
+        }
         
-        wallet.transfer(tokenBasedLimitedInvestValue);
-        token.transfer(_msgSender(), tokensWithBonus);
-        
+        // transfer ETH
+        wallet.transfer(investment);
         if (change > 0) {
             payable(_msgSender()).transfer(change);
         }
 
-        return tokensWithBonus;
+        return tokens;
     }
 
     receive() external payable {
-        internalFallback();
+        buyWithCDOReferral();
     }
 
 }
