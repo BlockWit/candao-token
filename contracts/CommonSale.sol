@@ -69,6 +69,21 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         // return the number of purchasesd tokens and spent ETH
         return (tokensWithBonus, tokenBasedLimitedInvestValue);
     }
+    
+    function withdraw() public whenNotPaused {
+        require(block.timestamp >= getLatestStageEnd(), "CommonSale: sale is not over yet");
+        uint256 balanceCDO = balancesCDO[_msgSender()];
+        uint256 balanceETH = balancesETH[_msgSender()];
+        require(balanceCDO > 0 || balanceETH > 0, "CommonSale: there are no assets that could be withdrawn from your account");
+        if (balanceCDO > 0) {
+            balancesCDO[_msgSender()] = 0;
+            token.transfer(_msgSender(), balanceCDO);
+        }
+        if (balanceETH > 0) {
+            balancesETH[_msgSender()] = 0;
+            payable(_msgSender()).transfer(balanceETH); 
+        }
+    }
 
     function buyWithCDOReferral() internal whenNotPaused returns (uint256) {
         uint256 stageIndex = getCurrentStageOrRevert();
