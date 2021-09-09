@@ -149,7 +149,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         return tokens;
     }
 
-    receive() external payable {
+    fallback() external payable {
         buyWithCDOReferral();
     }
 
