@@ -87,12 +87,44 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
 
         address referral = getInputAddress();
         if (referral != address(0)) {
-            require(referral != address(token) && referral != msg.sender && referral != address(this), "CommonSale: Incorrect referre address.");
+            require(referral != address(token) && referral != msg.sender && referral != address(this), "CommonSale: Incorrect referral address.");
             uint256 referralTokens = tokens.mul(stage.refCDOPercent).div(percentRate);
             balancesCDO[referral] = balancesCDO[referral].add(referralTokens);
             stage.refCDOAccrued = stage.refCDOAccrued.add(referralTokens);
         }
         
+        // transfer ETH
+        wallet.transfer(investment);
+        if (change > 0) {
+            payable(_msgSender()).transfer(change);
+        }
+
+        return tokens;
+    }
+
+    function buyWithETHReferral(address referral) public payable whenNotPaused returns (uint256) {
+        uint256 stageIndex = getCurrentStageOrRevert();
+        Stage storage stage = stages[stageIndex];
+
+        // check min investment limit
+        require(msg.value >= stage.minInvestmentLimit, "CommonSale: The amount of ETH you sent is too small.");
+
+        (uint256 tokens, uint256 investment) = calculateAmounts(stage);
+        uint256 change = msg.value.sub(investment);
+
+        // update stats
+        invested = invested.add(investment);
+        stage.tokensSold = stage.tokensSold.add(tokens);
+        balancesCDO[_msgSender()] = balancesCDO[_msgSender()].add(tokens);
+
+        if (referral != address(0)) {
+            require(referral != address(token) && referral != msg.sender && referral != address(this), "CommonSale: Incorrect referral address.");
+            uint256 referralETH = investment.mul(stage.refETHPercent).div(percentRate);
+            balancesETH[referral] = balancesETH[referral].add(referralETH);
+            stage.refETHAccrued = stage.refETHAccrued.add(referralETH);
+            investment = investment.sub(referralETH);
+        }
+
         // transfer ETH
         wallet.transfer(investment);
         if (change > 0) {
