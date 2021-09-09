@@ -18,9 +18,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds {
     uint256 public percentRate = 100;
     address payable public wallet;
 
-    mapping(uint256 => mapping(address => uint256)) public balances;
-
-    mapping(uint256 => bool) public whitelistedStages;
+    mapping(address => uint256) public balances;
 
     function pause() public onlyOwner {
         _pause();
@@ -75,12 +73,12 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds {
         
         // calculate the resulting amount of ETH that user will spend and calculate the change if any
         uint256 tokenBasedLimitedInvestValue = tokensWithoutBonus.mul(1 ether).div(price);
-        uint256 change = msg.value - tokenBasedLimitedInvestValue;
+        uint256 change = msg.value.sub(tokenBasedLimitedInvestValue);
 
         // update stats
         invested = invested.add(tokenBasedLimitedInvestValue);
         stage.tokensSold = stage.tokensSold.add(tokensWithBonus);
-        balances[stageIndex][_msgSender()] = balances[stageIndex][_msgSender()].add(tokenBasedLimitedInvestValue);
+        balances[_msgSender()] = balances[_msgSender()].add(tokenBasedLimitedInvestValue);
         
         wallet.transfer(tokenBasedLimitedInvestValue);
         token.transfer(_msgSender(), tokensWithBonus);
