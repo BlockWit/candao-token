@@ -1,4 +1,4 @@
-const { dateFromNow, getEvents, increaseDateTo } = require('./util');
+const { dateFromNow, getEvents, getTransactionCost, increaseDateTo } = require('./util');
 const { accounts, contract, web3 } = require('@openzeppelin/test-environment');
 const { BN, ether, expectRevert } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
@@ -162,6 +162,51 @@ describe('CommonSale', async function () {
     await increaseDateTo(end);
     await sale.withdraw({ from: buyer });
     await expectRevert(sale.withdraw({ from: buyer }), 'CommonSale: there are no assets that could be withdrawn from your account');
+  });
+
+  it('should charge referral bonuses in ETH correctly', async function () {
+    const { start, refETH } = STAGES[0];
+    const { end } = STAGES[2];
+    await increaseDateTo(start);
+    const ethSent = ether('0.123');
+    await sale.buyWithETHReferral(referral, { value: ethSent, from: buyer });
+    const referralETHExpected = ethSent.muln(refETH).divn(100);
+    const referralETHAccrued = await sale.balancesETH(referral);
+    expect(referralETHAccrued).to.be.bignumber.equal(referralETHExpected);
+    await increaseDateTo(end);
+    const referralBalanceBefore = new BN(await web3.eth.getBalance(referral));
+    const { tx, receipt: { gasUsed } } = await sale.withdraw({ from: referral });
+    const { gasPrice } = await web3.eth.getTransaction(tx);
+    const gasCost = (new BN(gasPrice)).mul(new BN(gasUsed));
+    const referralBalanceAfter = await web3.eth.getBalance(referral);
+    expect(referralBalanceAfter).to.be.bignumber.equal(referralBalanceBefore.add(referralETHExpected).sub(gasCost));
+  });
+
+  it('should allow to withdraw both tokens and ETH obtained through the referral system', async function () {
+    const { start, bonus, refToken, refETH } = STAGES[1];
+    const { end } = STAGES[2];
+    await increaseDateTo(start);
+    const ethSent1 = ether('0.123');
+    const ethSent2 = ether('0.456');
+    const ethSent3 = ether('0.789');
+    const referralBalanceBefore = new BN(await web3.eth.getBalance(referral));
+    const { tx: tx1 } = await sale.sendTransaction({ value: ethSent1, from: referral });
+    await sale.sendTransaction({ value: ethSent2, from: buyer, data: referral });
+    await sale.buyWithETHReferral(referral, { value: ethSent3, from: buyer });
+    await increaseDateTo(end);
+    const { tx: tx2, receipt: { transactionHash } } = await sale.withdraw({ from: referral });
+    const tx1Cost = await getTransactionCost(tx1, web3);
+    const tx2Cost = await getTransactionCost(tx2, web3);
+    const events = await getEvents(transactionHash, token, 'Transfer', web3);
+
+    const referralTokensPurchased = ethSent1.muln(PRICE * (100 + bonus)).divn(100);
+    const buyerTokensExpected = ethSent2.muln(PRICE * (100 + bonus)).divn(100);
+    const referralTokensAccrued = buyerTokensExpected.muln(refToken).divn(100);
+    const referralETHAccrued = ethSent3.muln(refETH).divn(100);
+    const referralTokensReceived = new BN(events[0].args.value);
+    const referralBalanceAfter = new BN(await web3.eth.getBalance(referral));
+    expect(referralTokensReceived).to.be.bignumber.equal(referralTokensPurchased.add(referralTokensAccrued));
+    expect(referralBalanceAfter).to.be.bignumber.equal(referralBalanceBefore.add(referralETHAccrued).sub(tx1Cost).sub(tx2Cost).sub(ethSent1));
   });
 
   it('should remove stage by index correctly', async function () {

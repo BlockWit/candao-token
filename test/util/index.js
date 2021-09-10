@@ -1,4 +1,5 @@
 const { time } = require('@openzeppelin/test-helpers');
+const { toBN } = require('web3-utils');
 // This decodes logs for a single event type, and returns a decoded object in
 // the same form truffle-contract uses on its receipts
 // This function is a part of '@openzeppelin/test-helpers'
@@ -40,6 +41,18 @@ function decodeLogs (logs, emitter, eventName, web3) {
 }
 
 /**
+ *
+ * @param hash - transaction hash
+ * @param web3 - web3 instance
+ * @returns {Promise<BN>} - transaction cost
+ */
+async function getTransactionCost (hash, web3) {
+  const { gasPrice } = await web3.eth.getTransaction(hash);
+  const { gasUsed } = await web3.eth.getTransactionReceipt(hash);
+  return toBN(gasPrice).mul(toBN(gasUsed));
+}
+
+/**
  * Calculates the date that occurs exactly X days from now
  * @param days - number of days from current date
  * @returns {promise} - Unix TimeStamp in seconds
@@ -73,6 +86,7 @@ async function getEvents (txHash, emitter, eventName, web3) {
 
 module.exports = {
   getEvents,
+  getTransactionCost,
   dateFromNow,
   increaseDateTo
 }
