@@ -43,11 +43,12 @@
     "no-redeclare": ["error", {"builtinGlobals": true}],
     "no-trailing-spaces": ["error", { "skipBlankLines": false }],
     "no-undef": "error",
+    "no-unused-vars": "warn",
     "no-use-before-define": "off",
     "no-var": "error",
     "object-curly-spacing": ["error", "always"],
     "prefer-const": "error",
-    "quotes": ["error", "single"],
+    "quotes": ["warn", "single", { "allowTemplateLiterals": true }],
     "semi": ["error", "always"],
     "space-before-function-paren": ["error", "always"],
 
