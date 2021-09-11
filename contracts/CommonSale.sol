@@ -10,17 +10,31 @@ import "./CandaoToken.sol";
 import "./InputAddress.sol";
 
 contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress {
-    
+
     using SafeMath for uint256;
+
+    struct WithdrawalPolicy {
+        uint256 duration;
+        uint256 interval;
+        uint8 bonus; // amount of intervals that can be withdrawed immediately after start
+    }
+
+    struct Balance {
+        uint256 initialCDO;
+        uint256 withdrawedCDO;
+        uint256 balanceETH;
+        uint8 withdrawalPolicy;
+    }
 
     IERC20Cutted public token;
     uint256 public price; // amount of tokens per 1 ETH
     uint256 public invested;
     uint256 public percentRate = 100;
     address payable public wallet;
-
-    mapping(address => uint256) public balancesCDO;
-    mapping(address => uint256) public balancesETH;
+    bool public isWithdrawalActive;
+    uint256 public withdrawalStartDate;
+    WithdrawalPolicy[] public withdrawalPolicies;
+    mapping(address => Balance) public balances;
 
     function pause() public onlyOwner {
         _pause();
@@ -30,26 +44,54 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         _unpause();
     }
 
-    function setToken(address newTokenAddress) public onlyOwner() {
+    function activateWithdrawal() public onlyOwner {
+        isWithdrawalActive = true;
+        withdrawalStartDate = block.timestamp;
+    }
+
+    function setToken(address newTokenAddress) public onlyOwner {
         token = IERC20Cutted(newTokenAddress);
     }
 
-    function setPercentRate(uint256 newPercentRate) public onlyOwner() {
+    function setPercentRate(uint256 newPercentRate) public onlyOwner {
         percentRate = newPercentRate;
     }
 
-    function setWallet(address payable newWallet) public onlyOwner() {
+    function setWallet(address payable newWallet) public onlyOwner {
         wallet = newWallet;
     }
 
-    function setPrice(uint256 newPrice) public onlyOwner() {
+    function setPrice(uint256 newPrice) public onlyOwner {
         price = newPrice;
     }
 
-    function updateInvested(uint256 value) internal {
-        invested = invested.add(value);
+    function setBalance(address account, uint256 initialCDO, uint256 withdrawedCDO, uint256 balanceETH, uint8 withdrawalPolicy) public onlyOwner {
+        balances[account].initialCDO = initialCDO;
+        balances[account].withdrawedCDO = withdrawedCDO;
+        balances[account].balanceETH = balanceETH;
+        balances[account].withdrawalPolicy = withdrawalPolicy;
     }
-    
+
+    function addBalances(address[] calldata addresses, uint256[] calldata balancesCDO, uint8 withdrawalPolicy) public onlyOwner {
+        require(addresses.length == balancesCDO.length, "CommonSale: Incorrect array length.");
+        for (uint256 i = 0; i < addresses.length - 1; i++) {
+            balances[addresses[i]].initialCDO = balances[addresses[i]].initialCDO.add(balancesCDO[i]);
+            setAccountWithdrawalPolicyIfNotSet(addresses[i], withdrawalPolicy);
+        }
+    }
+
+    function setWithdrawalPolicy(uint256 index, uint256 duration, uint256 interval, uint8 bonus) public onlyOwner {
+        withdrawalPolicies[index].duration = duration * 1 days;
+        withdrawalPolicies[index].interval = interval * 1 days;
+        withdrawalPolicies[index].bonus = bonus;
+    }
+
+    function setAccountWithdrawalPolicyIfNotSet(address account, uint8 withdrawalPolicyId) internal {
+        if (balances[account].withdrawalPolicy == 0) {
+            balances[account].withdrawalPolicy = withdrawalPolicyId;
+        }
+    }
+
     function calculateAmounts(Stage memory stage) internal view returns (uint256, uint256) {
         // apply a bonus if any (CDO)
         uint256 tokensWithoutBonus = msg.value.mul(price).div(1 ether);
@@ -65,49 +107,71 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
             }
         }
         // calculate the resulting amount of ETH that user will spend
-        uint256 tokenBasedLimitedInvestValue = tokensWithoutBonus.mul(1 ether).div(price); 
+        uint256 tokenBasedLimitedInvestValue = tokensWithoutBonus.mul(1 ether).div(price);
         // return the number of purchasesd tokens and spent ETH
         return (tokensWithBonus, tokenBasedLimitedInvestValue);
     }
-    
-    function withdraw() public whenNotPaused {
-        require(block.timestamp >= getLatestStageEnd(), "CommonSale: sale is not over yet");
-        uint256 balanceCDO = balancesCDO[_msgSender()];
-        uint256 balanceETH = balancesETH[_msgSender()];
-        require(balanceCDO > 0 || balanceETH > 0, "CommonSale: there are no assets that could be withdrawn from your account");
-        if (balanceCDO > 0) {
-            balancesCDO[_msgSender()] = 0;
-            token.transfer(_msgSender(), balanceCDO);
+
+    function calculateWithdrawalAmount(address account) public view returns (uint256) {
+        Balance memory balance = balances[account];
+        WithdrawalPolicy memory policy = withdrawalPolicies[balance.withdrawalPolicy];
+        uint256 tokensAwailable;
+        if (block.timestamp >= withdrawalStartDate + policy.duration) {
+            tokensAwailable = balance.initialCDO;
+        } else {
+            uint256 parts = policy.duration.div(policy.interval);
+            uint256 tokensByPart = balance.initialCDO.div(parts);
+            uint256 timeSinceStart = block.timestamp.sub(withdrawalStartDate);
+            uint256 pastParts = timeSinceStart.div(policy.interval).add(policy.bonus);
+            tokensAwailable = pastParts.mul(tokensByPart);
         }
-        if (balanceETH > 0) {
-            balancesETH[_msgSender()] = 0;
-            payable(_msgSender()).transfer(balanceETH); 
+        return tokensAwailable.sub(balance.withdrawedCDO);
+    }
+
+    function withdraw() public whenNotPaused {
+        require(isWithdrawalActive, "CommonSale: withdrawal is not yet active");
+        Balance storage balance = balances[_msgSender()];
+        uint256 cdoToSend = calculateWithdrawalAmount(_msgSender());
+        require(cdoToSend > 0 || balance.balanceETH > 0, "CommonSale: there are no assets that could be withdrawn from your account");
+        if (balance.balanceETH > 0) {
+            uint256 ethToSend = balance.balanceETH;
+            balance.balanceETH = 0;
+            payable(_msgSender()).transfer(ethToSend);
+        }
+        if (cdoToSend > 0) {
+            balance.withdrawedCDO = balance.withdrawedCDO.add(cdoToSend);
+            token.transfer(_msgSender(), cdoToSend);
         }
     }
 
     function buyWithCDOReferral() internal whenNotPaused returns (uint256) {
         uint256 stageIndex = getCurrentStageOrRevert();
         Stage storage stage = stages[stageIndex];
-        
+
         // check min investment limit
         require(msg.value >= stage.minInvestmentLimit, "CommonSale: The amount of ETH you sent is too small.");
 
         (uint256 tokens, uint256 investment) = calculateAmounts(stage);
+
+        require(tokens > 0, "CommonSale: No tokens available for purchase.");
+
         uint256 change = msg.value.sub(investment);
 
         // update stats
         invested = invested.add(investment);
         stage.tokensSold = stage.tokensSold.add(tokens);
-        balancesCDO[_msgSender()] = balancesCDO[_msgSender()].add(tokens);
+        balances[_msgSender()].initialCDO = balances[_msgSender()].initialCDO.add(tokens);
+        setAccountWithdrawalPolicyIfNotSet(_msgSender(), 1);
 
         address referral = getInputAddress();
         if (referral != address(0)) {
-            require(referral != address(token) && referral != msg.sender && referral != address(this), "CommonSale: Incorrect referral address.");
+            require(referral != address(token) && referral != _msgSender() && referral != address(this), "CommonSale: Incorrect referral address.");
             uint256 referralTokens = tokens.mul(stage.refCDOPercent).div(percentRate);
-            balancesCDO[referral] = balancesCDO[referral].add(referralTokens);
+            balances[referral].initialCDO = balances[referral].initialCDO.add(referralTokens);
             stage.refCDOAccrued = stage.refCDOAccrued.add(referralTokens);
+            setAccountWithdrawalPolicyIfNotSet(referral, 1);
         }
-        
+
         // transfer ETH
         wallet.transfer(investment);
         if (change > 0) {
@@ -125,18 +189,23 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         require(msg.value >= stage.minInvestmentLimit, "CommonSale: The amount of ETH you sent is too small.");
 
         (uint256 tokens, uint256 investment) = calculateAmounts(stage);
+
+        require(tokens > 0, "CommonSale: No tokens available for purchase.");
+
         uint256 change = msg.value.sub(investment);
 
         // update stats
         invested = invested.add(investment);
         stage.tokensSold = stage.tokensSold.add(tokens);
-        balancesCDO[_msgSender()] = balancesCDO[_msgSender()].add(tokens);
+        balances[_msgSender()].initialCDO = balances[_msgSender()].initialCDO.add(tokens);
+        setAccountWithdrawalPolicyIfNotSet(_msgSender(), 1);
 
         if (referral != address(0)) {
-            require(referral != address(token) && referral != msg.sender && referral != address(this), "CommonSale: Incorrect referral address.");
+            require(referral != address(token) && referral != _msgSender() && referral != address(this), "CommonSale: Incorrect referral address.");
             uint256 referralETH = investment.mul(stage.refETHPercent).div(percentRate);
-            balancesETH[referral] = balancesETH[referral].add(referralETH);
+            balances[referral].balanceETH = balances[referral].balanceETH.add(referralETH);
             stage.refETHAccrued = stage.refETHAccrued.add(referralETH);
+            setAccountWithdrawalPolicyIfNotSet(referral, 1);
             investment = investment.sub(referralETH);
         }
 
