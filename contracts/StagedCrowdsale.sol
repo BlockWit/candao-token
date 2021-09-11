@@ -72,7 +72,7 @@ contract StagedCrowdsale is Ownable {
         stage.minInvestmentLimit = minInvestmentLimit;
         stage.hardcapInTokens = hardcapInTokens;
         stage.refETHPercent = refETHPercent;
-        stage.refCDOPercent = refCDOPercent; 
+        stage.refCDOPercent = refCDOPercent;
     }
 
     function rewriteStage(
@@ -139,16 +139,6 @@ contract StagedCrowdsale is Ownable {
             }
         }
         revert("StagedCrowdsale: No suitable stage found");
-    }
-    
-    function getLatestStageEnd() public view returns (uint256) {
-        uint256 result;
-        for (uint256 i = 0; i < stages.length; i++) {
-            if (stages[i].end > result) {
-                result = stages[i].end;
-            }
-        }
-        return result;
     }
 
 }
