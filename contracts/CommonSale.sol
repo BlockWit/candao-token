@@ -33,7 +33,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     address payable public wallet;
     bool public isWithdrawalActive;
     uint256 public withdrawalStartDate;
-    WithdrawalPolicy[] public withdrawalPolicies;
+    mapping(uint8 => WithdrawalPolicy) public withdrawalPolicies;
     mapping(address => Balance) public balances;
 
     function pause() public onlyOwner {
@@ -80,7 +80,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         }
     }
 
-    function setWithdrawalPolicy(uint256 index, uint256 duration, uint256 interval, uint8 bonus) public onlyOwner {
+    function setWithdrawalPolicy(uint8 index, uint256 duration, uint256 interval, uint8 bonus) public onlyOwner {
         withdrawalPolicies[index].duration = duration * 1 days;
         withdrawalPolicies[index].interval = interval * 1 days;
         withdrawalPolicies[index].bonus = bonus;
@@ -113,8 +113,8 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     }
 
     function calculateWithdrawalAmount(address account) public view returns (uint256) {
-        Balance memory balance = balances[account];
-        WithdrawalPolicy memory policy = withdrawalPolicies[balance.withdrawalPolicy];
+        Balance storage balance = balances[account];
+        WithdrawalPolicy storage policy = withdrawalPolicies[balance.withdrawalPolicy];
         uint256 tokensAwailable;
         if (block.timestamp >= withdrawalStartDate + policy.duration) {
             tokensAwailable = balance.initialCDO;
