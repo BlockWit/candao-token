@@ -51,7 +51,7 @@ describe('CommonSale', async function () {
     const ethSent = ether('0.1');
     await sale.sendTransaction({ value: ethSent, from: buyer });
     const tokensExpected = ethSent.muln(PRICE * (100 + bonus) / 100);
-    const tokensReserved = await sale.balancesCDO(buyer);
+    const tokensReserved = (await sale.balances(buyer)).initialCDO;
     expect(tokensReserved).to.be.bignumber.equal(tokensExpected);
   });
 
@@ -60,7 +60,7 @@ describe('CommonSale', async function () {
     await increaseDateTo(start);
     const ethSent = ether('99');
     await sale.sendTransaction({ value: ethSent, from: buyer });
-    const tokensReserved = await sale.balancesCDO(buyer);
+    const tokensReserved = (await sale.balances(buyer)).initialCDO;
     expect(tokensReserved).to.be.bignumber.equal(hardcap);
   });
 
@@ -89,25 +89,24 @@ describe('CommonSale', async function () {
     const ethSent = ether('0.123');
     await sale.sendTransaction({ value: ethSent, from: buyer });
     const tokensExpected = ethSent.muln(PRICE * (100 + bonus) / 100);
-    const tokensReserved = await sale.balancesCDO(buyer);
+    const tokensReserved = (await sale.balances(buyer)).initialCDO;
     expect(tokensReserved).to.be.bignumber.equal(tokensExpected);
   });
 
-  it('should not allow token withdrawal before the end of the sale', async function () {
+  it('should not allow premature token withdrawal', async function () {
     const { start } = STAGES[1];
     await increaseDateTo(start);
     const ethSent = ether('0.123');
     await sale.sendTransaction({ value: ethSent, from: buyer });
-    await expectRevert(sale.withdraw({ from: buyer }), 'CommonSale: sale is not over yet');
+    await expectRevert(sale.withdraw({ from: buyer }), 'CommonSale: withdrawal is not yet active');
   });
 
   it('should allow to withdraw tokens after the end of the sale', async function () {
     const { start, bonus } = STAGES[1];
-    const { end } = STAGES[2];
     await increaseDateTo(start);
     const ethSent = ether('0.123');
     await sale.sendTransaction({ value: ethSent, from: buyer });
-    await increaseDateTo(end);
+    await sale.activateWithdrawal({ from: owner });
     const { receipt: { transactionHash } } = await sale.withdraw({ from: buyer });
     const events = await getEvents(transactionHash, token, 'Transfer', web3);
     const tokensExpected = ethSent.muln(PRICE * (100 + bonus) / 100);
@@ -121,28 +120,27 @@ describe('CommonSale', async function () {
     const ethSent1 = ether('0.123');
     const ethSent2 = ether('0.456');
     await sale.sendTransaction({ value: ethSent1, from: referral });
-    const referralTokensBefore = await sale.balancesCDO(referral);
+    const referralTokensBefore = (await sale.balances(referral)).initialCDO;
     await sale.sendTransaction({ value: ethSent2, from: buyer, data: referral });
     const tokensExpected = ethSent2.muln(PRICE * (100 + bonus) / 100);
-    const tokensActual = await sale.balancesCDO(buyer);
+    const tokensActual = (await sale.balances(buyer)).initialCDO;
     const referralTokensExpected = referralTokensBefore.add(tokensExpected.muln(refToken).divn(100));
-    const referralTokensActual = await sale.balancesCDO(referral);
+    const referralTokensActual = (await sale.balances(referral)).initialCDO;
     expect(tokensActual).to.be.bignumber.equal(tokensExpected);
     expect(referralTokensActual).to.be.bignumber.equal(referralTokensExpected);
   });
 
   it('should allow the withdrawal of tokens obtained through the referral system', async function () {
     const { start, bonus, refToken } = STAGES[1];
-    const { end } = STAGES[2];
     await increaseDateTo(start);
     const ethSent1 = ether('0.123');
     const ethSent2 = ether('0.456');
     await sale.sendTransaction({ value: ethSent1, from: referral });
-    const referralTokensBefore = await sale.balancesCDO(referral);
+    const referralTokensBefore = (await sale.balances(referral)).initialCDO;
     await sale.sendTransaction({ value: ethSent2, from: buyer, data: referral });
     const tokensExpected = ethSent2.muln(PRICE * (100 + bonus) / 100);
     const referralTokensExpected = referralTokensBefore.add(tokensExpected.muln(refToken).divn(100));
-    await increaseDateTo(end);
+    await sale.activateWithdrawal({ from: owner });
     const tx1 = await sale.withdraw({ from: buyer });
     const events1 = await getEvents(tx1.receipt.transactionHash, token, 'Transfer', web3);
     const tokensActual = new BN(events1[0].args.value);
@@ -155,25 +153,23 @@ describe('CommonSale', async function () {
 
   it('should reject to withdraw tokens from empty account', async function () {
     const { start } = STAGES[1];
-    const { end } = STAGES[2];
     await increaseDateTo(start);
     const ethSent = ether('0.123');
     await sale.sendTransaction({ value: ethSent, from: buyer });
-    await increaseDateTo(end);
+    await sale.activateWithdrawal({ from: owner });
     await sale.withdraw({ from: buyer });
     await expectRevert(sale.withdraw({ from: buyer }), 'CommonSale: there are no assets that could be withdrawn from your account');
   });
 
   it('should charge referral bonuses in ETH correctly', async function () {
     const { start, refETH } = STAGES[0];
-    const { end } = STAGES[2];
     await increaseDateTo(start);
     const ethSent = ether('0.123');
     await sale.buyWithETHReferral(referral, { value: ethSent, from: buyer });
     const referralETHExpected = ethSent.muln(refETH).divn(100);
-    const referralETHAccrued = await sale.balancesETH(referral);
+    const referralETHAccrued = (await sale.balances(referral)).balanceETH;
     expect(referralETHAccrued).to.be.bignumber.equal(referralETHExpected);
-    await increaseDateTo(end);
+    await sale.activateWithdrawal({ from: owner });
     const referralBalanceBefore = new BN(await web3.eth.getBalance(referral));
     const { tx, receipt: { gasUsed } } = await sale.withdraw({ from: referral });
     const { gasPrice } = await web3.eth.getTransaction(tx);
@@ -184,7 +180,6 @@ describe('CommonSale', async function () {
 
   it('should allow to withdraw both tokens and ETH obtained through the referral system', async function () {
     const { start, bonus, refToken, refETH } = STAGES[1];
-    const { end } = STAGES[2];
     await increaseDateTo(start);
     const ethSent1 = ether('0.123');
     const ethSent2 = ether('0.456');
@@ -193,7 +188,7 @@ describe('CommonSale', async function () {
     const { tx: tx1 } = await sale.sendTransaction({ value: ethSent1, from: referral });
     await sale.sendTransaction({ value: ethSent2, from: buyer, data: referral });
     await sale.buyWithETHReferral(referral, { value: ethSent3, from: buyer });
-    await increaseDateTo(end);
+    await sale.activateWithdrawal({ from: owner });
     const { tx: tx2, receipt: { transactionHash } } = await sale.withdraw({ from: referral });
     const tx1Cost = await getTransactionCost(tx1, web3);
     const tx2Cost = await getTransactionCost(tx2, web3);
