@@ -20,31 +20,21 @@ contract Configurator is RecoverableFunds {
         uint256[] memory supplies = new uint256[](14);
 
         // casual eth accounts
-        accounts[0]  = 0x43Fa4fb5Fd9365242c0215C73B863aEE98128A7e; // SEED
-        accounts[1]  = 0xe74b3Ba0e474eA8EE89da99Ef38889ED229e8782; // PRIVATE SALE
-        accounts[2]  = 0xe74b3Ba0e474eA8EE89da99Ef38889ED229e8782; // DAO 1
-        accounts[3]  = 0xe74b3Ba0e474eA8EE89da99Ef38889ED229e8782; // DAO 2
-        accounts[4]  = 0x539e3b4Cf63685cB2aE9adA4414335EB0B496Aec; // CONTENT MINING
-        accounts[5]  = 0xe6Df6C96794063F2cC1Dc338908B2a04Ff29eBd4; // LIQUIDITY POOL
-        accounts[6]  = 0x3aCe47351C48a4971b62176Ef3538C51397a0d5E; // FOUNDATION 1
-        accounts[7]  = 0x3aCe47351C48a4971b62176Ef3538C51397a0d5E; // FOUNDATION 2
-        accounts[8]  = 0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71; // MARKETING 1
-        accounts[9]  = 0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71; // MARKETING 2
-        accounts[10] = 0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71; // MARKETING 3
+        accounts[0] = 0xe74b3Ba0e474eA8EE89da99Ef38889ED229e8782; // DAO 1
+        accounts[1] = 0xe74b3Ba0e474eA8EE89da99Ef38889ED229e8782; // DAO 2
+        accounts[2] = 0x539e3b4Cf63685cB2aE9adA4414335EB0B496Aec; // CONTENT MINING
+        accounts[3] = 0xe6Df6C96794063F2cC1Dc338908B2a04Ff29eBd4; // LIQUIDITY POOL
+        accounts[4] = 0x3aCe47351C48a4971b62176Ef3538C51397a0d5E; // FOUNDATION 1
+        accounts[5] = 0x3aCe47351C48a4971b62176Ef3538C51397a0d5E; // FOUNDATION 2
 
         // supplies for casual eth accounts
-        supplies[0]  = 81_000_000  ether; // SEED
-        supplies[1]  = 84_000_000  ether; // PRIVATE SALE
-        supplies[2]  = 150_000_000 ether; // DAO 1
-        supplies[3]  = 250_000_000 ether; // DAO 2
-        supplies[4]  = 210_000_000 ether; // CONTENT MINING
-        supplies[5]  = 200_000_000 ether; // LIQUIDITY POOL
-        supplies[6]  = 50_000_000  ether; // FOUNDATION 1
-        supplies[7]  = 100_000_000 ether; // FOUNDATION 2
-        supplies[8]  = 10_000_000  ether; // MARKETING 1
-        supplies[9]  = 40_000_000  ether; // MARKETING 2
-        supplies[10] = 50_000_000  ether; // MARKETING 3
-        supplies[11] = 275_000_000 ether; // COMMON SALE (85_000_000 public sale + 150_000_000 team + 40_000_000 advisors)
+        supplies[0] = 150_000_000 ether; // DAO 1
+        supplies[1] = 250_000_000 ether; // DAO 2
+        supplies[2] = 210_000_000 ether; // CONTENT MINING
+        supplies[3] = 200_000_000 ether; // LIQUIDITY POOL
+        supplies[4] = 50_000_000  ether; // FOUNDATION 1
+        supplies[5] = 100_000_000 ether; // FOUNDATION 2
+        supplies[6] = 540_000_000 ether; // SALE (seed, private sale, public sale, marketing, team, advisors)
 
         // create sale
         sale = new CommonSale();
@@ -59,8 +49,11 @@ contract Configurator is RecoverableFunds {
         sale.setWithdrawalPolicy(2, 17 * 30, 30, 3); // 15% is available from the stat, 5% is released every month
         sale.setWithdrawalPolicy(3, 18 * 30, 30, 2); // 10% is available from the stat, 5% is released every month
         // accounts
-        sale.setBalance(0x5219Cc08E635e9764c8014D984d60Fb7Ed200EEB, 150_000_000, 0, 0, 3);  // TEAM account
-        sale.setBalance(0x05422B2b38ec652384F1b9dFA3487B2eeA58B544, 40_000_000, 0, 0, 3);   // ADVISORS account
+        sale.setBalance(0x5219Cc08E635e9764c8014D984d60Fb7Ed200EEB, 150_000_000, 0, 0, 3); // TEAM account
+        sale.setBalance(0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71, 10_000_000, 0, 0, 3);  // MARKETING 1 account
+        sale.setBalance(0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71, 40_000_000, 0, 0, 3);  // MARKETING 2 account
+        sale.setBalance(0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71, 50_000_000, 0, 0, 3);  // MARKETING 3 account
+        sale.setBalance(0x05422B2b38ec652384F1b9dFA3487B2eeA58B544, 40_000_000, 0, 0, 3);  // ADVISORS account
         accounts[11] = address(sale);
 
         // create token
