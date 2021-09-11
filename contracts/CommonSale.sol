@@ -116,14 +116,14 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         Balance storage balance = balances[account];
         WithdrawalPolicy storage policy = withdrawalPolicies[balance.withdrawalPolicy];
         uint256 tokensAwailable;
-        if (block.timestamp >= withdrawalStartDate + policy.duration) {
+        if (block.timestamp >= withdrawalStartDate.add(policy.duration).sub(policy.interval.mul(policy.bonus))) {
             tokensAwailable = balance.initialCDO;
         } else {
             uint256 parts = policy.duration.div(policy.interval);
             uint256 tokensByPart = balance.initialCDO.div(parts);
             uint256 timeSinceStart = block.timestamp.sub(withdrawalStartDate);
-            uint256 pastParts = timeSinceStart.div(policy.interval).add(policy.bonus);
-            tokensAwailable = pastParts.mul(tokensByPart);
+            uint256 pastParts = timeSinceStart.div(policy.interval);
+            tokensAwailable = (pastParts.add(policy.bonus)).mul(tokensByPart);
         }
         return tokensAwailable.sub(balance.withdrawedCDO);
     }
