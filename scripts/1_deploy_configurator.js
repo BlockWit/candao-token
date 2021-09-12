@@ -9,10 +9,6 @@ async function deploy () {
   log(`Configurator deployed at address: @address{${configurator.address}}`);
   log(`Sale address @address{${await configurator.sale()}}`);
   log(`Token address: @address{${await configurator.token()}}`);
-  log(`Wallets:`);
-  for (let i = 0; i < 5; i++) {
-    log(`@address{${await configurator.wallets(i)}}`);
-  }
 }
 
 module.exports = async function main (callback) {
