@@ -41,9 +41,9 @@ contract Configurator is RecoverableFunds {
         sale.setWallet(ETH_WALLET_ADDRESS);
         sale.setPrice(21674 ether);
         // stages
-        sale.addStage(1630882800, 1631487600, 50,  30000000000000000, 0, 0, 28305000000000000000000000, 0, 0, 5, 10);
-        sale.addStage(1631487600, 1632092400, 20,  30000000000000000, 0, 0, 28305000000000000000000000, 0, 0, 5, 10);
-        sale.addStage(1632092400, 1632697200, 0,   30000000000000000, 0, 0, 28390000000000000000000000, 0, 0, 5, 10);
+        sale.addStage(1631635200, 1632240000, 50,  30000000000000000, 0, 0, 28305000000000000000000000, 0, 0, 5, 10);
+        sale.addStage(1632240000, 1632844800, 20,  30000000000000000, 0, 0, 28305000000000000000000000, 0, 0, 5, 10);
+        sale.addStage(1632844800, 4788518400, 0,   30000000000000000, 0, 0, 28390000000000000000000000, 0, 0, 5, 10);
         // withdrawal policies
         sale.setWithdrawalPolicy(1, 20 * 30, 30, 4); // 20% is available from the stat, 5% is released every month
         sale.setWithdrawalPolicy(2, 20 * 30, 30, 3); // 15% is available from the stat, 5% is released every month
