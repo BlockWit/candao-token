@@ -27,14 +27,14 @@ contract Configurator is RecoverableFunds {
         accounts[4] = 0x3aCe47351C48a4971b62176Ef3538C51397a0d5E; // FOUNDATION 1
         accounts[5] = 0x3aCe47351C48a4971b62176Ef3538C51397a0d5E; // FOUNDATION 2
 
-        // supplies for casual eth accounts
+        // supplies for casual eth accounts and sale contract
         supplies[0] = 150_000_000 ether; // DAO 1
         supplies[1] = 250_000_000 ether; // DAO 2
         supplies[2] = 210_000_000 ether; // CONTENT MINING
-        supplies[3] = 200_000_000 ether; // LIQUIDITY POOL
+        supplies[3] = 191_500_000 ether; // LIQUIDITY POOL
         supplies[4] = 50_000_000  ether; // FOUNDATION 1
         supplies[5] = 100_000_000 ether; // FOUNDATION 2
-        supplies[6] = 540_000_000 ether; // SALE (seed, private sale, public sale, marketing, team, advisors)
+        supplies[6] = 548_500_000 ether; // SALE (seed, private sale, public sale, marketing, team, advisors)
 
         // create sale
         sale = new CommonSale();
