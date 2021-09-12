@@ -1,5 +1,6 @@
 const { toBN, toWei } = web3.utils;
 const { logger } = require('./util');
+const { ether } = require('@openzeppelin/test-helpers');
 const Configurator = artifacts.require('Configurator');
 const Token = artifacts.require('CandaoToken');
 const Sale = artifacts.require('CommonSale');
@@ -15,7 +16,7 @@ async function deploy () {
   const token = await Token.at(TOKEN_ADDRESS);
 
   const { log, logRevert } = logger(await web3.eth.net.getNetworkType());
-  const [ , owner, buyer, anotherAccount] = await web3.eth.getAccounts();
+  const [deployer, owner, buyer, referral, anotherAccount] = await web3.eth.getAccounts();
 
   await logRevert(async () => {
     log(`CommonSale. Attempting to send Ether to the CommonSale contract before the sale starts. Should revert.`);
@@ -56,6 +57,18 @@ async function deploy () {
     log(`Result: successful tx: @tx{${tx.transactionHash}}`);
   })();
 
+  await (async () => {
+    log(`CommonSale. Send 0.09 Eth from buyer's account. Specify CDO referral.`);
+    const tx = await web3.eth.sendTransaction({ from: buyer, to: SALE_ADDRESS, value: toWei('0.09', 'ether'), data: referral, gas: '200000' });
+    log(`Result: successful tx: @tx{${tx.transactionHash}}`);
+  })();
+
+  await (async () => {
+    log(`CommonSale. Send 0.09 Eth from buyer's account. Specify ETH referral.`);
+    const tx = await sale.buyWithETHReferral(referral, { from: buyer, value: toWei('0.09', 'ether') });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  })();
+
   await logRevert(async () => {
     log(`CommonSale. Attempting to enable withdrawal from non-owner account. Should revert.`);
     const tx = await sale.activateWithdrawal({ from: buyer });
@@ -85,9 +98,49 @@ async function deploy () {
   })();
 
   await (async () => {
+    log(`CommonSale. Withdraw from referral's account.`);
+    const tx = await sale.withdraw({ from: referral });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  })();
+
+  await (async () => {
     log(`Token. Transfer from buyer's account.`);
     const balance = await token.balanceOf(buyer);
     const tx = await token.transfer(anotherAccount, balance, { from: buyer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  })();
+
+  await logRevert(async () => {
+    log(`CommonSale. Attemping to set balance from non-owner account. Should revert`);
+    const amount = ether('1');
+    const tx = await sale.setBalance(anotherAccount, amount, 0, 0, 2, { from: buyer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }, (txHash, reason) => {
+    log(`Result: Revert with reason '${reason}'. @tx{${txHash}}`);
+  });
+
+  await (async () => {
+    log(`CommonSale. Set balance. Should rewrite target account's balance.`);
+    const amount = ether('1');
+    const tx = await sale.setBalance(anotherAccount, amount, 0, 0, 2, { from: owner });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  })();
+
+  await logRevert(async () => {
+    log(`CommonSale. Attemping to add balances from non-owner account. Should revert`);
+    const amount1 = ether('1');
+    const amount2 = ether('2');
+    const tx = await sale.addBalances([buyer, anotherAccount], [amount1, amount2], 2, { from: buyer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }, (txHash, reason) => {
+    log(`Result: Revert with reason '${reason}'. @tx{${txHash}}`);
+  });
+
+  await (async () => {
+    log(`CommonSale. add balances. Should increase target accounts by specified amounts.`);
+    const amount1 = ether('1');
+    const amount2 = ether('2');
+    const tx = await sale.addBalances([buyer, anotherAccount], [amount1, amount2], 2, { from: owner });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   })();
 }
