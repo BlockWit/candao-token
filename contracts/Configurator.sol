@@ -16,8 +16,8 @@ contract Configurator is RecoverableFunds {
         address         OWNER_ADDRESS      = address(0xAdF3bFAcf63b401163FFbf1040B97C6d024c3c9A);
         address payable ETH_WALLET_ADDRESS = payable(0xf83c2172950d2Cc6490F164bb08F2381C2CdEc82);
 
-        address[] memory accounts = new address[](14);
-        uint256[] memory supplies = new uint256[](14);
+        address[] memory accounts = new address[](7);
+        uint256[] memory supplies = new uint256[](7);
 
         // casual eth accounts
         accounts[0] = 0xe74b3Ba0e474eA8EE89da99Ef38889ED229e8782; // DAO 1
@@ -54,7 +54,7 @@ contract Configurator is RecoverableFunds {
         sale.setBalance(0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71, 40_000_000, 0, 0, 3);  // MARKETING 2 account
         sale.setBalance(0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71, 50_000_000, 0, 0, 3);  // MARKETING 3 account
         sale.setBalance(0x05422B2b38ec652384F1b9dFA3487B2eeA58B544, 40_000_000, 0, 0, 3);  // ADVISORS account
-        accounts[11] = address(sale);
+        accounts[6] = address(sale);
 
         // create token
         require(accounts.length == supplies.length, "Configurator: wrong account array length");
