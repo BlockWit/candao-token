@@ -74,7 +74,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
 
     function addBalances(address[] calldata addresses, uint256[] calldata balancesCDO, uint8 withdrawalPolicy) public onlyOwner {
         require(addresses.length == balancesCDO.length, "CommonSale: Incorrect array length.");
-        for (uint256 i = 0; i < addresses.length - 1; i++) {
+        for (uint256 i = 0; i < addresses.length; i++) {
             balances[addresses[i]].initialCDO = balances[addresses[i]].initialCDO.add(balancesCDO[i]);
             setAccountWithdrawalPolicyIfNotSet(addresses[i], withdrawalPolicy);
         }
