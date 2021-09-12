@@ -13,7 +13,7 @@ contract Configurator is RecoverableFunds {
     CommonSale public sale;
 
     constructor() {
-        address         OWNER_ADDRESS      = address(0xAdF3bFAcf63b401163FFbf1040B97C6d024c3c9A);
+        address         OWNER_ADDRESS      = address(0x0b2cBc8a2D434dc16818B0664Dd81e89fAA9c3AC);
         address payable ETH_WALLET_ADDRESS = payable(0xf83c2172950d2Cc6490F164bb08F2381C2CdEc82);
 
         address[] memory accounts = new address[](7);
