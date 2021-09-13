@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CDO Sale Integration example</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <div class="navbar-text ml-auto">First, connect Your MetaMask wallet here -></div>
+        <button class="btn btn-outline-secondary ml-4" id="connect" type="button">Connect</button>
+    </div>
+</nav>
+<div class="container pt-4">
+    <div class="row">
+        <div class="col-sm-9 col-md-6 col-lg-4 mx-auto">
+            <div class="card mb-5">
+                <div class="card-header">Reward referral in CDO</div>
+                <div class="card-body">
+                    <form id="reward-cdo">
+                        <div class="form-group">
+                            <label for="amount-1">amount of ETH to send</label>
+                            <input type="text" class="form-control" id="amount-1">
+                        </div>
+                        <div class="form-group">
+                            <label for="referral-address-1">referral address</label>
+                            <input type="text" class="form-control" id="referral-address-1">
+                            <small class="form-text text-muted">leave this field empty if you don't want to specify referral</small>
+                        </div>
+                        <div id="reward-cdo-feedback" class="mb-3 d-none"></div>
+                        <button type="submit" class="btn btn-secondary btn-block">buy</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-9 col-md-6 col-lg-4 mx-auto">
+            <div class="card mb-5">
+                <div class="card-header">Reward referral in ETH</div>
+                <div class="card-body">
+                    <form id="reward-eth">
+                        <div class="form-group">
+                            <label for="amount-2">amount of ETH to send</label>
+                            <input type="text" class="form-control" id="amount-2">
+                        </div>
+                        <div class="form-group">
+                            <label for="referral-address-2">referral address</label>
+                            <input type="text" class="form-control" id="referral-address-2">
+                            <small class="form-text text-muted">this field is required</small>
+                        </div>
+                        <div id="reward-eth-feedback" class="mb-3 d-none"></div>
+                        <button type="submit" class="btn btn-secondary btn-block">buy</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-9 col-md-6 col-lg-4 mx-auto">
+            <div class="card">
+                <div class="card-header">Withdraw Example</div>
+                <div class="card-body">
+                    <form id="withdraw">
+                        <div id="withdraw-feedback" class="mb-3 d-none"></div>
+                        <button type="submit" class="btn btn-secondary btn-block">withraw</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="index.bundle.js"></script>
+</html>

@@ -52,6 +52,10 @@ Candao smart-contract
 6. The difference between theese two strings is your encoded constructor arguements.
 7. Pass them to `truffle-verify-plugin` as paramter: `--forceConstructorArgs string:ABIEncodedArguments`
 
+#### How to use frontent example
+1. `npx webpack build --config front/webpack.config.js`
+2. Open `front/index.html` in browser.
+
 ### Wallets with ERC20 support
 1. [MyEtherWallet](https://www.myetherwallet.com)
 2. Parity

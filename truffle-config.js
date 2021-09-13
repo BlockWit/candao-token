@@ -71,7 +71,7 @@ module.exports = {
     kovan: {
       provider: () => new HDWalletProvider(ETH_TEST_MNEMONIC, `https://kovan.infura.io/v3/${CONFIG.INFURA_KEY}`, 0, 20),
       network_id: 42,
-      gasPrice: 1000000000, // 1 Gwei
+      gasPrice: 10000000000, // 10 Gwei
       gas: 12500000,
       timeoutBlocks: 200,
       skipDryRun: true
@@ -80,7 +80,7 @@ module.exports = {
       provider: () => new HDWalletProvider(ETH_TEST_MNEMONIC, `https://ropsten.infura.io/v3/${CONFIG.INFURA_KEY}`, 0, 20),
       network_id: 3,
       gasPrice: 80000000000, // 80 Gwei
-      gas: 8000000,  
+      gas: 8000000,
       timeoutBlocks: 200,   // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true      // Skip dry run before migrations? (default: false for public nets )
     },
@@ -111,11 +111,11 @@ module.exports = {
       }
     }
   },
-  
+
   plugins: [
     'truffle-plugin-verify'
   ],
-  
+
   api_keys: {
     etherscan: CONFIG.ETHERSCAN_KEY
   }
@@ -127,7 +127,7 @@ module.exports = {
   // NOTE: It is not possible to migrate your contracts to truffle DB and you should
   // make a backup of your artifacts to a safe location before enabling this feature.
   //
-  // After you backed up your artifacts you can utilize db by running migrate as follows: 
+  // After you backed up your artifacts you can utilize db by running migrate as follows:
   // $ truffle migrate --reset --compile-all
   //
   // db: {
