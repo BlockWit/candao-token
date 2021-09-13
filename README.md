@@ -8,18 +8,17 @@
 * _[Decimals](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md#decimals)_        : 18
 * _Emission_        : One-time, 1 500 000 000 tokens
 * _Fiat dependency_ : No
-* _Token offers_    : 2
+* _Token offers_    : 1
 * _Token locks_     : Yes
 
 ## Smart contracts description
 
 Candao smart-contract
 
-### Contracts contains
+### Contracts
 1. _Configurator_
 2. _CandaoToken_ - Token contract
 3. _Sale_ - Sale contract
-4. _FreezeWallet_ - Contract for releasing tokens in accordance with the Tokenomy
 
 ### Token distribution
 1. _DAO_: 400 000 000
@@ -68,28 +67,29 @@ EXODUS does not support ERC20, but provides the ability to export the private ke
 * [Sale](https://etherscan.io)
 
 ### Sale stages
-#### Stage 1: "Private Sale"
+#### Stage 1
 * Price                             : 21564 CDO per ETH
 * Minimum purchase volume           : 0,03 ETH
-* HardCap                           : 84 000 000 CDO
-* Start date                        : Aug 16 00:00:00 2021 GMT+0100
-* End date                          : Sep 06 00:00:00 2021 GMT+0100
-* Bonuses                           :
-    * Aug 16 00:00:00 2021 GMT+0100	- Aug 23 00:00:00 2021 GMT+0100: 500%
-    * Aug 23 00:00:00 2021 GMT+0100	- Aug 30 00:00:00 2021 GMT+0100: 300%
-    * Aug 30 00:00:00 2021 GMT+0100	- Sep 06 00:00:00 2021 GMT+0100: 200%
+* HardCap                           : 28 305 000 CDO
+* Start date                        : 
+* End date                          : 
+* Bonus                             : 50%
 
- 
-#### Stage 2: "Public Sale"
+#### Stage 2
 * Price                             : 21564 CDO per ETH
 * Minimum purchase volume           : 0,03 ETH
-* HardCap                           : 85 000 000 CDO
-* Start date                        : Sep 06 00:00:00 2021 GMT+0100
-* End date                          : Sep 20 00:00:00 2021 GMT+0100
-* Bonuses                           :
-    * Sep 06 00:00:00 2021 GMT+0100	- Sep 13 00:00:00 2021 GMT+0100: 50%
-    * Sep 13 00:00:00 2021 GMT+0100	- Sep 20 00:00:00 2021 GMT+0100: 20%
-    * Sep 20 00:00:00 2021 GMT+0100	- Sep 27 00:00:00 2021 GMT+0100: 0%
+* HardCap                           : 28 305 000 CDO
+* Start date                        :
+* End date                          :
+* Bonus                             : 20%
+
+#### Stage 3
+* Price                             : 21564 CDO per ETH
+* Minimum purchase volume           : 0,03 ETH
+* HardCap                           : 28 390 000 CDO
+* Start date                        :
+* End date                          :
+* Bonus                             : 0%
 
 ## Test network configuration (Kovan)
 You can find kovan test log [here](docs/kovan.log.md)
