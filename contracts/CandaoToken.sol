@@ -14,13 +14,13 @@ import "./WithCallback.sol";
  */
 contract CandaoToken is ERC20, ERC20Burnable, Pausable, RecoverableFunds, WithCallback {
 
-    mapping(address => bool) public whitelist;
+    mapping(address => bool) public unpausable;
 
     modifier notPaused(address account) {
-        require(!paused() || whitelist[account], "Pausable: paused");
+        require(!paused() || unpausable[account], "Pausable: paused");
         _;
     }
-    
+
     constructor(string memory name, string memory symbol, address[] memory initialAccounts, uint256[] memory initialBalances) payable ERC20(name, symbol) {
         for(uint8 i = 0; i < initialAccounts.length; i++) {
             _mint(initialAccounts[i], initialBalances[i]);
@@ -29,16 +29,16 @@ contract CandaoToken is ERC20, ERC20Burnable, Pausable, RecoverableFunds, WithCa
 
     function addToWhitelist(address[] memory accounts) public onlyOwner {
         for(uint8 i = 0; i < accounts.length; i++) {
-            whitelist[accounts[i]] = true;
+            unpausable[accounts[i]] = true;
         }
     }
 
     function removeFromWhitelist(address[] memory accounts) public onlyOwner {
         for(uint8 i = 0; i < accounts.length; i++) {
-            whitelist[accounts[i]] = false;
+            unpausable[accounts[i]] = false;
         }
     }
-    
+
     function pause() public onlyOwner {
         _pause();
     }

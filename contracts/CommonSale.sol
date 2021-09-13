@@ -36,6 +36,14 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     mapping(uint8 => WithdrawalPolicy) public withdrawalPolicies;
     mapping(address => Balance) public balances;
 
+    event Deposit(address account, uint256 value);
+    event CDOWithdrawal(address account, uint256 value, uint256 left);
+    event ETHWithdrawal(address account, uint256 value);
+    event CDOReferralReward(address account, uint256 value);
+    event ETHReferralReward(address account, uint256 value);
+    event WithdrawalIsActive();
+    event NewPrice(uint256 value);
+
     function pause() public onlyOwner {
         _pause();
     }
@@ -45,8 +53,10 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     }
 
     function activateWithdrawal() public onlyOwner {
+        require(!isWithdrawalActive, "CommonSale: Withdrawal is already enabled.");
         isWithdrawalActive = true;
         withdrawalStartDate = block.timestamp;
+        emit WithdrawalIsActive();
     }
 
     function setToken(address newTokenAddress) public onlyOwner {
@@ -63,6 +73,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
 
     function setPrice(uint256 newPrice) public onlyOwner {
         price = newPrice;
+        emit NewPrice(newPrice);
     }
 
     function setBalance(address account, uint256 initialCDO, uint256 withdrawedCDO, uint256 balanceETH, uint8 withdrawalPolicy) public onlyOwner {
@@ -137,10 +148,12 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
             uint256 ethToSend = balance.balanceETH;
             balance.balanceETH = 0;
             payable(_msgSender()).transfer(ethToSend);
+            emit ETHWithdrawal(_msgSender(), ethToSend);
         }
         if (cdoToSend > 0) {
             balance.withdrawedCDO = balance.withdrawedCDO.add(cdoToSend);
             token.transfer(_msgSender(), cdoToSend);
+            emit CDOWithdrawal(_msgSender(), cdoToSend, balance.initialCDO.sub(balance.withdrawedCDO));
         }
     }
 
@@ -161,6 +174,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         invested = invested.add(investment);
         stage.tokensSold = stage.tokensSold.add(tokens);
         balances[_msgSender()].initialCDO = balances[_msgSender()].initialCDO.add(tokens);
+        emit Deposit(_msgSender(), tokens);
         setAccountWithdrawalPolicyIfNotSet(_msgSender(), 1);
 
         address referral = getInputAddress();
@@ -168,6 +182,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
             require(referral != address(token) && referral != _msgSender() && referral != address(this), "CommonSale: Incorrect referral address.");
             uint256 referralTokens = tokens.mul(stage.refCDOPercent).div(percentRate);
             balances[referral].initialCDO = balances[referral].initialCDO.add(referralTokens);
+            emit CDOReferralReward(referral, referralTokens);
             stage.refCDOAccrued = stage.refCDOAccrued.add(referralTokens);
             setAccountWithdrawalPolicyIfNotSet(referral, 1);
         }
@@ -198,12 +213,14 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         invested = invested.add(investment);
         stage.tokensSold = stage.tokensSold.add(tokens);
         balances[_msgSender()].initialCDO = balances[_msgSender()].initialCDO.add(tokens);
+        emit Deposit(_msgSender(), tokens);
         setAccountWithdrawalPolicyIfNotSet(_msgSender(), 1);
 
         if (referral != address(0)) {
             require(referral != address(token) && referral != _msgSender() && referral != address(this), "CommonSale: Incorrect referral address.");
             uint256 referralETH = investment.mul(stage.refETHPercent).div(percentRate);
             balances[referral].balanceETH = balances[referral].balanceETH.add(referralETH);
+            emit ETHReferralReward(referral, referralETH);
             stage.refETHAccrued = stage.refETHAccrued.add(referralETH);
             setAccountWithdrawalPolicyIfNotSet(referral, 1);
             investment = investment.sub(referralETH);
