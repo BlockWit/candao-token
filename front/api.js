@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { isAddress, parseEther } from 'ethers/lib/utils';
 
 const SALE_ABI = [
-  'function balances(address account) public returns (uint256, uint256, uint256, uint8)',
+  'function balances(address account) public view returns (uint256, uint256, uint256, uint8)',
   'function buyWithETHReferral(address referral) public payable returns (uint256)',
   'function withdraw() public'
 ];
@@ -36,6 +36,12 @@ export default {
     const web3Provider = await this.getWeb3Provider();
     return await web3Provider.waitForTransaction(txHash);
   },
+  signMessage: async function (message) {
+    await this.getAccounts();
+    const web3provider = await this.getWeb3Provider();
+    const signer = web3provider.getSigner();
+    return await signer.signMessage(message);
+  },
   // Sale contract interaction
   buyWithCDOReferral: async function (amount, referral) {
     const web3provider = await this.getWeb3Provider();
@@ -55,10 +61,11 @@ export default {
     const contractWithSigner = contract.connect(signer);
     return await contractWithSigner.buyWithETHReferral(referral, { value: parseEther(amount) });
   },
-  requestAccountBalance: async function (accountAddress) {
+  requestAccountInfo: async function (accountAddress) {
     const web3provider = await this.getWeb3Provider();
     const contract = new ethers.Contract(SALE_ADDRESS, SALE_ABI, web3provider);
-    return await contract.balances(accountAddress);
+    const [ initialCDO, withdrawedCDO, balanceETH, withdrawalPolicy ] = await contract.balances(accountAddress);
+    return { initialCDO: initialCDO.toString(), withdrawedCDO: withdrawedCDO.toString(), balanceETH: balanceETH.toString(), withdrawalPolicy: withdrawalPolicy.toString() };
   },
   withdraw: async function () {
     const web3provider = await this.getWeb3Provider();

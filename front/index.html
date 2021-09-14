@@ -11,13 +11,13 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
-        <div class="navbar-text ml-auto">First, connect Your MetaMask wallet here -></div>
+        <div class="navbar-text ml-auto"><span id="connect-message">First, connect Your MetaMask wallet here -></span></div>
         <button class="btn btn-outline-secondary ml-4" id="connect" type="button">Connect</button>
     </div>
 </nav>
 <div class="container pt-4">
     <div class="row">
-        <div class="col-sm-9 col-md-6 col-lg-4 mx-auto">
+        <div class="col-sm-6 col-lg-4">
             <div class="card mb-5">
                 <div class="card-header">Reward referral in CDO</div>
                 <div class="card-body">
@@ -37,9 +37,7 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-9 col-md-6 col-lg-4 mx-auto">
+        <div class="col-sm-6 col-lg-4">
             <div class="card mb-5">
                 <div class="card-header">Reward referral in ETH</div>
                 <div class="card-body">
@@ -59,15 +57,39 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-9 col-md-6 col-lg-4 mx-auto">
-            <div class="card">
-                <div class="card-header">Withdraw Example</div>
+        <div class="col-sm-6 col-lg-4">
+            <div class="card mb-5">
+                <div class="card-header">Withdraw CDO and ETH</div>
                 <div class="card-body">
                     <form id="withdraw">
                         <div id="withdraw-feedback" class="mb-3 d-none"></div>
                         <button type="submit" class="btn btn-secondary btn-block">withraw</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            <div class="card">
+                <div class="card-header">Account Info</div>
+                <div class="card-body">
+                    <form id="account-info">
+                        <div id="account-info-feedback" class="mb-3 d-none"></div>
+                        <button type="submit" class="btn btn-secondary btn-block">Get info</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            <div class="card">
+                <div class="card-header">Sign message</div>
+                <div class="card-body">
+                    <form id="sign-message">
+                        <div class="form-group">
+                            <label for="message">message to sign</label>
+                            <input type="text" class="form-control" id="message">
+                        </div>
+                        <div id="sign-message-feedback" class="mb-3 d-none"></div>
+                        <button type="submit" class="btn btn-secondary btn-block">Sign</button>
                     </form>
                 </div>
             </div>
