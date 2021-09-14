@@ -52,7 +52,7 @@ Candao smart-contract
 6. The difference between theese two strings is your encoded constructor arguements.
 7. Pass them to `truffle-verify-plugin` as paramter: `--forceConstructorArgs string:ABIEncodedArguments`
 
-#### How to use frontent example
+#### How to use frontend examples
 1. `npx webpack build --config front/webpack.config.js`
 2. Open `front/index.html` in browser.
 
