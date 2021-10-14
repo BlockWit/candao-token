@@ -14,30 +14,29 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     using SafeMath for uint256;
 
     struct VestingSchedule {
+        uint256 delay;      // the amount of time before vesting starts
         uint256 duration;
         uint256 interval;
-        uint8 offset; // the number of intervals that must be skipped immediately after start
+        uint256 unlocked;   // percentage of initially unlocked tokens
     }
 
     struct Balance {
         uint256 initialCDO;
         uint256 withdrawnCDO;
         uint256 balanceETH;
-        uint8 vestingSchedule;
     }
 
     IERC20Cutted public token;
     uint256 public price; // amount of tokens per 1 ETH
-    uint256 public invested;
     uint256 public percentRate = 100;
     address payable public wallet;
     bool public isWithdrawalActive;
     uint256 public withdrawalStartDate;
     mapping(uint8 => VestingSchedule) public vestingSchedules;
-    mapping(address => Balance) public balances;
+    mapping(uint256 => mapping(address => Balance)) public balances;
 
     event Deposit(address account, uint256 value);
-    event CDOWithdrawal(address account, uint256 value, uint256 left);
+    event CDOWithdrawal(address account, uint256 value);
     event ETHWithdrawal(address account, uint256 value);
     event CDOReferralReward(address account, uint256 value);
     event ETHReferralReward(address account, uint256 value);
@@ -76,32 +75,28 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         emit NewPrice(newPrice);
     }
 
-    function setBalance(address account, uint256 initialCDO, uint256 withdrawnCDO, uint256 balanceETH, uint8 vestingSchedule) public onlyOwner {
-        balances[account].initialCDO = initialCDO;
-        balances[account].withdrawnCDO = withdrawnCDO;
-        balances[account].balanceETH = balanceETH;
-        balances[account].vestingSchedule = vestingSchedule;
+    function setBalance(uint256 stage, address account, uint256 initialCDO, uint256 withdrawnCDO, uint256 balanceETH) public onlyOwner {
+        Balance storage balance = balances[stage][account];
+        balance.initialCDO = initialCDO;
+        balance.withdrawnCDO = withdrawnCDO;
+        balance.balanceETH = balanceETH;
     }
 
-    function addBalances(address[] calldata addresses, uint256[] calldata balancesCDO, uint8 vestingSchedule) public onlyOwner {
+    function addBalances(uint256 stage, address[] calldata addresses, uint256[] calldata balancesCDO) public onlyOwner {
         require(addresses.length == balancesCDO.length, "CommonSale: Incorrect array length.");
         for (uint256 i = 0; i < addresses.length; i++) {
-            balances[addresses[i]].initialCDO = balances[addresses[i]].initialCDO.add(balancesCDO[i]);
-            setAccountVestingScheduleIfNotSet(addresses[i], vestingSchedule);
+            Balance storage balance = balances[stage][addresses[i]];
+            balance.initialCDO = balance.initialCDO.add(balancesCDO[i]);
             emit Deposit(addresses[i], balancesCDO[i]);
         }
     }
 
-    function setVestingSchedule(uint8 index, uint256 duration, uint256 interval, uint8 offset) public onlyOwner {
-        vestingSchedules[index].duration = duration * 1 days;
-        vestingSchedules[index].interval = interval * 1 days;
-        vestingSchedules[index].offset = offset;
-    }
-
-    function setAccountVestingScheduleIfNotSet(address account, uint8 vestingScheduleId) internal {
-        if (balances[account].vestingSchedule == 0) {
-            balances[account].vestingSchedule = vestingScheduleId;
-        }
+    function setVestingSchedule(uint8 index, uint256 delay, uint256 duration, uint256 interval, uint256 unlocked) public onlyOwner {
+        VestingSchedule storage schedule = vestingSchedules[index];
+        schedule.delay = delay;
+        schedule.duration = duration;
+        schedule.interval = interval;
+        schedule.unlocked = unlocked;
     }
 
     function calculateAmounts(Stage memory stage) internal view returns (uint256, uint256) {
@@ -124,44 +119,71 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         return (tokensWithBonus, tokenBasedLimitedInvestValue);
     }
 
-    function calculateWithdrawalAmount(address account) public view returns (uint256) {
-        Balance storage balance = balances[account];
-        VestingSchedule storage schedule = vestingSchedules[balance.vestingSchedule];
-        uint256 tokensAwailable;
-        if (block.timestamp >= withdrawalStartDate.add(schedule.duration).sub(schedule.interval.mul(schedule.offset))) {
-            tokensAwailable = balance.initialCDO;
+    function calculateVestedAmount(Balance memory balance, VestingSchedule memory schedule) internal view returns (uint256) {
+        uint256 tokensAvailable;
+        if (block.timestamp >= withdrawalStartDate.add(schedule.delay).add(schedule.duration)) {
+            tokensAvailable = balance.initialCDO;
         } else {
             uint256 parts = schedule.duration.div(schedule.interval);
             uint256 tokensByPart = balance.initialCDO.div(parts);
-            uint256 timeSinceStart = block.timestamp.sub(withdrawalStartDate);
+            uint256 timeSinceStart = block.timestamp.sub(withdrawalStartDate).sub(schedule.delay);
             uint256 pastParts = timeSinceStart.div(schedule.interval);
-            tokensAwailable = (pastParts.add(schedule.offset)).mul(tokensByPart);
+            uint256 initiallyUnlocked = balance.initialCDO.mul(schedule.unlocked).div(percentRate);
+            tokensAvailable = tokensByPart.mul(pastParts).add(initiallyUnlocked);
         }
-        return tokensAwailable.sub(balance.withdrawnCDO);
+        return tokensAvailable.sub(balance.withdrawnCDO);
+    }
+
+    function calculateVestedAmount(address account) public view returns (uint256) {
+        uint256 tokens;
+        for (uint256 stageIndex = 0; stageIndex < stages.length; stageIndex++) {
+            Balance memory balance = balances[stageIndex][account];
+            if (balance.initialCDO == 0) continue;
+            uint8 scheduleIndex = stages[stageIndex].vestingSchedule;
+            VestingSchedule memory schedule = vestingSchedules[scheduleIndex];
+            uint256 vestedAmount = calculateVestedAmount(balance, schedule);
+            if (vestedAmount == 0) continue;
+            tokens = tokens.add(vestedAmount);
+        }
+        return tokens;
     }
 
     function withdraw() public whenNotPaused {
         require(isWithdrawalActive, "CommonSale: withdrawal is not yet active");
-        Balance storage balance = balances[_msgSender()];
-        uint256 cdoToSend = calculateWithdrawalAmount(_msgSender());
-        require(cdoToSend > 0 || balance.balanceETH > 0, "CommonSale: there are no assets that could be withdrawn from your account");
-        if (balance.balanceETH > 0) {
-            uint256 ethToSend = balance.balanceETH;
-            balance.balanceETH = 0;
+        uint256 cdoToSend;
+        uint256 ethToSend;
+        for (uint256 stageIndex = 0; stageIndex < stages.length; stageIndex++) {
+            Balance storage balance = balances[stageIndex][_msgSender()];
+            if (balance.initialCDO > 0) {
+                uint8 scheduleIndex = stages[stageIndex].vestingSchedule;
+                VestingSchedule memory schedule = vestingSchedules[scheduleIndex];
+                uint256 vestedAmount = calculateVestedAmount(balance, schedule);
+                if (vestedAmount > 0) {
+                    balance.withdrawnCDO = balance.withdrawnCDO.add(vestedAmount);
+                    cdoToSend = cdoToSend.add(vestedAmount);
+                }
+            }
+            if (balance.balanceETH > 0) {
+                ethToSend = ethToSend.add(balance.balanceETH);
+                balance.balanceETH = 0;
+            }
+        }
+        require(cdoToSend > 0 || ethToSend > 0, "CommonSale: there are no assets that could be withdrawn from your account");
+        if (cdoToSend > 0) {
+            token.transfer(_msgSender(), cdoToSend);
+            emit CDOWithdrawal(_msgSender(), cdoToSend);
+        }
+        if (ethToSend > 0) {
             payable(_msgSender()).transfer(ethToSend);
             emit ETHWithdrawal(_msgSender(), ethToSend);
-        }
-        if (cdoToSend > 0) {
-            balance.withdrawnCDO = balance.withdrawnCDO.add(cdoToSend);
-            token.transfer(_msgSender(), cdoToSend);
-            emit CDOWithdrawal(_msgSender(), cdoToSend, balance.initialCDO.sub(balance.withdrawnCDO));
         }
     }
 
     function buyWithCDOReferral() internal whenNotPaused returns (uint256) {
-        int256 stageIndex = getCurrentStage();
-        require(stageIndex >= 0, "StagedCrowdsale: No suitable stage found");
-        Stage storage stage = stages[uint256(stageIndex)];
+        int256 idx = getCurrentStage();
+        require(idx >= 0, "StagedCrowdsale: No suitable stage found");
+        uint256 stageIndex = uint256(idx);
+        Stage storage stage = stages[stageIndex];
 
         // check min investment limit
         require(msg.value >= stage.minInvestmentLimit, "CommonSale: The amount of ETH you sent is too small.");
@@ -173,20 +195,18 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         uint256 change = msg.value.sub(investment);
 
         // update stats
-        invested = invested.add(investment);
+        stage.invested = stage.invested.add(investment);
         stage.tokensSold = stage.tokensSold.add(tokens);
-        balances[_msgSender()].initialCDO = balances[_msgSender()].initialCDO.add(tokens);
+        balances[stageIndex][_msgSender()].initialCDO = balances[stageIndex][_msgSender()].initialCDO.add(tokens);
         emit Deposit(_msgSender(), tokens);
-        setAccountVestingScheduleIfNotSet(_msgSender(), 1);
 
         address referral = getInputAddress();
         if (referral != address(0)) {
             require(referral != address(token) && referral != _msgSender() && referral != address(this), "CommonSale: Incorrect referral address.");
             uint256 referralTokens = tokens.mul(stage.refCDOPercent).div(percentRate);
-            balances[referral].initialCDO = balances[referral].initialCDO.add(referralTokens);
+            balances[stageIndex][referral].initialCDO = balances[stageIndex][referral].initialCDO.add(referralTokens);
             emit CDOReferralReward(referral, referralTokens);
             stage.refCDOAccrued = stage.refCDOAccrued.add(referralTokens);
-            setAccountVestingScheduleIfNotSet(referral, 1);
         }
 
         // transfer ETH
@@ -199,8 +219,9 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     }
 
     function buyWithETHReferral(address referral) public payable whenNotPaused returns (uint256) {
-        int256 stageIndex = getCurrentStage();
-        require(stageIndex >= 0, "StagedCrowdsale: No suitable stage found");
+        int256 idx = getCurrentStage();
+        require(idx >= 0, "StagedCrowdsale: No suitable stage found");
+        uint256 stageIndex = uint256(idx);
         Stage storage stage = stages[uint256(stageIndex)];
 
         // check min investment limit
@@ -213,19 +234,17 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         uint256 change = msg.value.sub(investment);
 
         // update stats
-        invested = invested.add(investment);
+        stage.invested = stage.invested.add(investment);
         stage.tokensSold = stage.tokensSold.add(tokens);
-        balances[_msgSender()].initialCDO = balances[_msgSender()].initialCDO.add(tokens);
+        balances[stageIndex][_msgSender()].initialCDO = balances[stageIndex][_msgSender()].initialCDO.add(tokens);
         emit Deposit(_msgSender(), tokens);
-        setAccountVestingScheduleIfNotSet(_msgSender(), 1);
 
         if (referral != address(0)) {
             require(referral != address(token) && referral != _msgSender() && referral != address(this), "CommonSale: Incorrect referral address.");
             uint256 referralETH = investment.mul(stage.refETHPercent).div(percentRate);
-            balances[referral].balanceETH = balances[referral].balanceETH.add(referralETH);
+            balances[stageIndex][referral].balanceETH = balances[stageIndex][referral].balanceETH.add(referralETH);
             emit ETHReferralReward(referral, referralETH);
             stage.refETHAccrued = stage.refETHAccrued.add(referralETH);
-            setAccountVestingScheduleIfNotSet(referral, 1);
             investment = investment.sub(referralETH);
         }
 

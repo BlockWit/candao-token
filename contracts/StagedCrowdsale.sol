@@ -22,6 +22,7 @@ contract StagedCrowdsale is Ownable {
         uint256 refCDOAccrued;
         uint256 refETHPercent;
         uint256 refCDOPercent;
+        uint8 vestingSchedule;
     }
 
     Stage[] public stages;
@@ -41,10 +42,11 @@ contract StagedCrowdsale is Ownable {
         uint256 refETHAccrued,
         uint256 refCDOAccrued,
         uint256 refETHPercent,
-        uint256 refCDOPercent
+        uint256 refCDOPercent,
+        uint8 vestingSchedule
     ) public onlyOwner {
         require(stages.length < type(uint256).max, "StagedCrowdsale: The maximum number of stages has been reached");
-        stages.push(Stage(start, end, bonus, minInvestmentLimit, invested, tokensSold, hardcapInTokens, refETHAccrued, refCDOAccrued, refETHPercent, refCDOPercent));
+        stages.push(Stage(start, end, bonus, minInvestmentLimit, invested, tokensSold, hardcapInTokens, refETHAccrued, refCDOAccrued, refETHPercent, refCDOPercent, vestingSchedule));
     }
 
     function removeStage(uint8 index) public onlyOwner {
@@ -63,7 +65,8 @@ contract StagedCrowdsale is Ownable {
         uint256 minInvestmentLimit,
         uint256 hardcapInTokens,
         uint256 refETHPercent,
-        uint256 refCDOPercent
+        uint256 refCDOPercent,
+        uint8 vestingSchedule
     ) public onlyOwner {
         require(index < stages.length, "StagedCrowdsale: Wrong stage index");
         Stage storage stage = stages[index];
@@ -74,6 +77,7 @@ contract StagedCrowdsale is Ownable {
         stage.hardcapInTokens = hardcapInTokens;
         stage.refETHPercent = refETHPercent;
         stage.refCDOPercent = refCDOPercent;
+        stage.vestingSchedule = vestingSchedule;
     }
 
     function rewriteStage(
@@ -88,7 +92,8 @@ contract StagedCrowdsale is Ownable {
         uint256 refETHAccrued,
         uint256 refCDOAccrued,
         uint256 refETHPercent,
-        uint256 refCDOPercent
+        uint256 refCDOPercent,
+        uint8 vestingSchedule
     ) public onlyOwner {
         require(index < stages.length, "StagedCrowdsale: Wrong stage index");
         Stage storage stage = stages[index];
@@ -103,6 +108,7 @@ contract StagedCrowdsale is Ownable {
         stage.refCDOAccrued = refCDOAccrued;
         stage.refETHPercent = refETHPercent;
         stage.refCDOPercent = refCDOPercent;
+        stage.vestingSchedule = vestingSchedule;
     }
 
     function insertStage(
@@ -117,14 +123,15 @@ contract StagedCrowdsale is Ownable {
         uint256 refETHAccrued,
         uint256 refCDOAccrued,
         uint256 refETHPercent,
-        uint256 refCDOPercent
+        uint256 refCDOPercent,
+        uint8 vestingSchedule
     ) public onlyOwner {
         require(index < stages.length, "StagedCrowdsale: Wrong stage index");
         require(stages.length < type(uint256).max, "StagedCrowdsale: The maximum number of stages has been reached");
         for (uint256 i = stages.length; i > index; i--) {
             stages[i] = stages[i - 1];
         }
-        stages[index] = Stage(start, end, bonus, minInvestmentLimit, invested, tokensSold, hardcapInTokens, refETHAccrued, refCDOAccrued, refETHPercent, refCDOPercent);
+        stages[index] = Stage(start, end, bonus, minInvestmentLimit, invested, tokensSold, hardcapInTokens, refETHAccrued, refCDOAccrued, refETHPercent, refCDOPercent, vestingSchedule);
     }
 
     function deleteStages() public onlyOwner {
