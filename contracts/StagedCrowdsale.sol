@@ -80,58 +80,18 @@ contract StagedCrowdsale is Ownable {
         stage.vestingSchedule = vestingSchedule;
     }
 
-    function rewriteStage(
-        uint8 index,
-        uint256 start,
-        uint256 end,
-        uint256 bonus,
-        uint256 minInvestmentLimit,
-        uint256 invested,
-        uint256 tokensSold,
-        uint256 hardcapInTokens,
-        uint256 refETHAccrued,
-        uint256 refCDOAccrued,
-        uint256 refETHPercent,
-        uint256 refCDOPercent,
-        uint8 vestingSchedule
-    ) public onlyOwner {
+    function rewriteStage(uint256 index, Stage calldata stage) public onlyOwner {
         require(index < stages.length, "StagedCrowdsale: Wrong stage index");
-        Stage storage stage = stages[index];
-        stage.start = start;
-        stage.end = end;
-        stage.bonus = bonus;
-        stage.minInvestmentLimit = minInvestmentLimit;
-        stage.invested = invested;
-        stage.tokensSold = tokensSold;
-        stage.hardcapInTokens = hardcapInTokens;
-        stage.refETHAccrued = refETHAccrued;
-        stage.refCDOAccrued = refCDOAccrued;
-        stage.refETHPercent = refETHPercent;
-        stage.refCDOPercent = refCDOPercent;
-        stage.vestingSchedule = vestingSchedule;
+        stages[index] = stage;
     }
 
-    function insertStage(
-        uint8 index,
-        uint256 start,
-        uint256 end,
-        uint256 bonus,
-        uint256 minInvestmentLimit,
-        uint256 invested,
-        uint256 tokensSold,
-        uint256 hardcapInTokens,
-        uint256 refETHAccrued,
-        uint256 refCDOAccrued,
-        uint256 refETHPercent,
-        uint256 refCDOPercent,
-        uint8 vestingSchedule
-    ) public onlyOwner {
+    function insertStage(uint256 index, Stage calldata stage) public onlyOwner {
         require(index < stages.length, "StagedCrowdsale: Wrong stage index");
         require(stages.length < type(uint256).max, "StagedCrowdsale: The maximum number of stages has been reached");
         for (uint256 i = stages.length; i > index; i--) {
             stages[i] = stages[i - 1];
         }
-        stages[index] = Stage(start, end, bonus, minInvestmentLimit, invested, tokensSold, hardcapInTokens, refETHAccrued, refCDOAccrued, refETHPercent, refCDOPercent, vestingSchedule);
+        stages[index] = stage;
     }
 
     function deleteStages() public onlyOwner {
