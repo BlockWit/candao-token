@@ -41,19 +41,31 @@ contract Configurator is RecoverableFunds {
         sale.setWallet(ETH_WALLET_ADDRESS);
         sale.setPrice(21674 ether);
         // stages
-        sale.addStage(1631635200, 1632240000, 50,  30000000000000000, 0, 0, 28305000000000000000000000, 0, 0, 5, 10);
-        sale.addStage(1632240000, 1632844800, 20,  30000000000000000, 0, 0, 28305000000000000000000000, 0, 0, 5, 10);
-        sale.addStage(1632844800, 4788518400, 0,   30000000000000000, 0, 0, 28390000000000000000000000, 0, 0, 5, 10);
+        sale.addStage(1631635200, 1632240000, 0,  30000000000000000, 0, 0, 28305000000000000000000000, 0, 0, 5, 10, 0);
+
         // withdrawal policies
-        sale.setVestingSchedule(1, 20 * 30, 30, 4); // 20% is available from the stat, 5% is released every month
-        sale.setVestingSchedule(2, 20 * 30, 30, 3); // 15% is available from the stat, 5% is released every month
-        sale.setVestingSchedule(3, 20 * 30, 30, 2); // 10% is available from the stat, 5% is released every month
+        // investors
+        sale.setVestingSchedule(1,  24 weeks, 104 weeks, 1 weeks, 40);
+        sale.setVestingSchedule(2,  12 weeks, 104 weeks, 1 weeks, 60);
+        sale.setVestingSchedule(3,  12 weeks, 104 weeks, 1 weeks, 60);
+        sale.setVestingSchedule(4,  12 weeks, 104 weeks, 1 weeks, 60);
+        sale.setVestingSchedule(5,   4 weeks, 104 weeks, 1 weeks, 100);
+        // ecosystem
+        sale.setVestingSchedule(6,   4 weeks, 208 weeks, 1 weeks, 15);
+        sale.setVestingSchedule(7,   4 weeks, 208 weeks, 1 weeks, 10);
+        sale.setVestingSchedule(8,   0,       208 weeks, 1 weeks, 20);
+        // internal
+        sale.setVestingSchedule(9,  10 weeks, 208 weeks, 1 weeks, 30);
+        sale.setVestingSchedule(10,  0,       208 weeks, 1 weeks, 50);
+        sale.setVestingSchedule(11,  0,       103 weeks, 1 weeks, 50);
+        sale.setVestingSchedule(12, 24 weeks, 104 weeks, 1 weeks, 50);
+
         // accounts
-        sale.setBalance(0x5219Cc08E635e9764c8014D984d60Fb7Ed200EEB, 150_000_000, 0, 0, 3); // TEAM account
-        sale.setBalance(0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71, 10_000_000, 0, 0, 3);  // MARKETING 1 account
-        sale.setBalance(0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71, 40_000_000, 0, 0, 3);  // MARKETING 2 account
-        sale.setBalance(0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71, 50_000_000, 0, 0, 3);  // MARKETING 3 account
-        sale.setBalance(0x05422B2b38ec652384F1b9dFA3487B2eeA58B544, 40_000_000, 0, 0, 3);  // ADVISORS account
+        sale.setBalance(0, 0x5219Cc08E635e9764c8014D984d60Fb7Ed200EEB, 150_000_000 ether, 0, 0); // TEAM account
+        sale.setBalance(0, 0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71,  10_000_000 ether, 0, 0); // MARKETING 1 account
+        sale.setBalance(0, 0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71,  40_000_000 ether, 0, 0); // MARKETING 2 account
+        sale.setBalance(0, 0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71,  50_000_000 ether, 0, 0); // MARKETING 3 account
+        sale.setBalance(0, 0x05422B2b38ec652384F1b9dFA3487B2eeA58B544,  40_000_000 ether, 0, 0); // ADVISORS account
         accounts[6] = address(sale);
 
         // create token
