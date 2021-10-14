@@ -9,9 +9,9 @@ const Sale = contract.fromArtifact('CommonSale');
 const [owner, ethWallet, buyer, referral] = accounts;
 const SUPPLY = 100000;
 const PRICE = 21674;
-const WITHDRAWAL_POLICIES = [
+const VESTING_SCHEDULES = [
   { index: 1, duration: 20 * 30, interval: 30, bonus: 4 },
-  { index: 2, duration: 20 * 30, interval: 30, bonus: 2 },
+  { index: 2, duration: 20 * 30, interval: 30, bonus: 2 }
 ];
 
 describe('CommonSale', async function () {
@@ -23,7 +23,7 @@ describe('CommonSale', async function () {
     STAGES = [
       { start: await dateFromNow(1), end: await dateFromNow(8), bonus: 500, minInvestmentLimit: ether('0.03'), hardcap: ether('40000'), refETH: 5, refToken: 10 },
       { start: await dateFromNow(9), end: await dateFromNow(11), bonus: 0, minInvestmentLimit: ether('0.03'), hardcap: ether('60000'), refETH: 5, refToken: 10 },
-      { start: await dateFromNow(11), end: await dateFromNow(13), bonus: 250, minInvestmentLimit: ether('0.03'), hardcap: ether('5000'), refETH: 5, refToken: 10 },
+      { start: await dateFromNow(11), end: await dateFromNow(13), bonus: 250, minInvestmentLimit: ether('0.03'), hardcap: ether('5000'), refETH: 5, refToken: 10 }
     ];
     sale = await Sale.new();
     token = await Token.new('Candao', 'CDO', [await sale.address], [ether(String(SUPPLY))]);
@@ -33,8 +33,8 @@ describe('CommonSale', async function () {
       await sale.addStage(start, end, bonus, minInvestmentLimit, 0, 0, hardcap, 0, 0, refETH, refToken);
     }
     await sale.setToken(await token.address);
-    for (const { index, duration, interval, bonus } of WITHDRAWAL_POLICIES) {
-      await sale.setWithdrawalPolicy(index, duration, interval, bonus);
+    for (const { index, duration, interval, bonus } of VESTING_SCHEDULES) {
+      await sale.setVestingSchedule(index, duration, interval, bonus);
     }
     await sale.transferOwnership(owner);
   });
@@ -49,7 +49,7 @@ describe('CommonSale', async function () {
 
   it('should allow to withdraw tokens after the end of the sale', async function () {
     const { start, bonus } = STAGES[1];
-    const { duration } = WITHDRAWAL_POLICIES[0];
+    const { duration } = VESTING_SCHEDULES[0];
     await increaseDateTo(start);
     const ethSent = ether('0.123');
     await sale.sendTransaction({ value: ethSent, from: buyer });
@@ -64,7 +64,7 @@ describe('CommonSale', async function () {
 
   it('should allow the withdrawal of tokens obtained through the referral system', async function () {
     const { start, bonus, refToken } = STAGES[1];
-    const { duration } = WITHDRAWAL_POLICIES[0];
+    const { duration } = VESTING_SCHEDULES[0];
     await increaseDateTo(start);
     const ethSent1 = ether('0.123');
     const ethSent2 = ether('0.456');
@@ -97,7 +97,7 @@ describe('CommonSale', async function () {
 
   it('should allow to withdraw both tokens and ETH obtained through the referral system', async function () {
     const { start, bonus, refToken, refETH } = STAGES[1];
-    const { duration } = WITHDRAWAL_POLICIES[0];
+    const { duration } = VESTING_SCHEDULES[0];
     await increaseDateTo(start);
     const ethSent1 = ether('0.123');
     const ethSent2 = ether('0.456');
@@ -122,7 +122,7 @@ describe('CommonSale', async function () {
     expect(referralBalanceAfter).to.be.bignumber.equal(referralBalanceBefore.add(referralETHAccrued).sub(tx1Cost).sub(tx2Cost).sub(ethSent1));
   });
 
-  it('should allow withdrawal of tokens in accordance with the withdrawal policy', async function () {
+  it('should allow withdrawal of tokens in accordance with the vesting schedule', async function () {
     const { start, bonus, refToken, refETH } = STAGES[1];
     await increaseDateTo(start);
     const ethSent1 = ether('0.123');
@@ -147,7 +147,7 @@ describe('CommonSale', async function () {
     const BONUS = 4;
 
     await sale.activateWithdrawal({ from: owner });
-    await sale.setWithdrawalPolicy(1, DURATION, INTERVAL, BONUS, { from: owner });
+    await sale.setVestingSchedule(1, DURATION, INTERVAL, BONUS, { from: owner });
     const { tx: tx2 } = await sale.withdraw({ from: referral });
     const tranche1 = new BN((await getEvents(tx2, token, 'Transfer', web3))[0].args.value);
     const tx2Cost = await getTransactionCost(tx2, web3);
@@ -166,7 +166,7 @@ describe('CommonSale', async function () {
 
   it('should allow to withdraw all available tokens at the end of vesting term', async function () {
     const { start, bonus } = STAGES[1];
-    const { duration } = WITHDRAWAL_POLICIES[0];
+    const { duration } = VESTING_SCHEDULES[0];
     await increaseDateTo(start);
     const ethSent = ether('0.456');
     await sale.sendTransaction({ value: ethSent, from: buyer });

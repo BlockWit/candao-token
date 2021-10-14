@@ -13,17 +13,17 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
 
     using SafeMath for uint256;
 
-    struct WithdrawalPolicy {
+    struct VestingSchedule {
         uint256 duration;
         uint256 interval;
-        uint8 bonus; // amount of intervals that can be withdrawed immediately after start
+        uint8 bonus; // amount of intervals that can be withdrawn immediately after start
     }
 
     struct Balance {
         uint256 initialCDO;
-        uint256 withdrawedCDO;
+        uint256 withdrawnCDO;
         uint256 balanceETH;
-        uint8 withdrawalPolicy;
+        uint8 VestingSchedule;
     }
 
     IERC20Cutted public token;
@@ -33,7 +33,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     address payable public wallet;
     bool public isWithdrawalActive;
     uint256 public withdrawalStartDate;
-    mapping(uint8 => WithdrawalPolicy) public withdrawalPolicies;
+    mapping(uint8 => VestingSchedule) public vestingSchedules;
     mapping(address => Balance) public balances;
 
     event Deposit(address account, uint256 value);
@@ -76,31 +76,31 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         emit NewPrice(newPrice);
     }
 
-    function setBalance(address account, uint256 initialCDO, uint256 withdrawedCDO, uint256 balanceETH, uint8 withdrawalPolicy) public onlyOwner {
+    function setBalance(address account, uint256 initialCDO, uint256 withdrawnCDO, uint256 balanceETH, uint8 VestingSchedule) public onlyOwner {
         balances[account].initialCDO = initialCDO;
-        balances[account].withdrawedCDO = withdrawedCDO;
+        balances[account].withdrawnCDO = withdrawnCDO;
         balances[account].balanceETH = balanceETH;
-        balances[account].withdrawalPolicy = withdrawalPolicy;
+        balances[account].VestingSchedule = VestingSchedule;
     }
 
-    function addBalances(address[] calldata addresses, uint256[] calldata balancesCDO, uint8 withdrawalPolicy) public onlyOwner {
+    function addBalances(address[] calldata addresses, uint256[] calldata balancesCDO, uint8 VestingSchedule) public onlyOwner {
         require(addresses.length == balancesCDO.length, "CommonSale: Incorrect array length.");
         for (uint256 i = 0; i < addresses.length; i++) {
             balances[addresses[i]].initialCDO = balances[addresses[i]].initialCDO.add(balancesCDO[i]);
-            setAccountWithdrawalPolicyIfNotSet(addresses[i], withdrawalPolicy);
+            setAccountVestingScheduleIfNotSet(addresses[i], VestingSchedule);
             emit Deposit(addresses[i], balancesCDO[i]);
         }
     }
 
-    function setWithdrawalPolicy(uint8 index, uint256 duration, uint256 interval, uint8 bonus) public onlyOwner {
-        withdrawalPolicies[index].duration = duration * 1 days;
-        withdrawalPolicies[index].interval = interval * 1 days;
-        withdrawalPolicies[index].bonus = bonus;
+    function setVestingSchedule(uint8 index, uint256 duration, uint256 interval, uint8 bonus) public onlyOwner {
+        vestingSchedules[index].duration = duration * 1 days;
+        vestingSchedules[index].interval = interval * 1 days;
+        vestingSchedules[index].bonus = bonus;
     }
 
-    function setAccountWithdrawalPolicyIfNotSet(address account, uint8 withdrawalPolicyId) internal {
-        if (balances[account].withdrawalPolicy == 0) {
-            balances[account].withdrawalPolicy = withdrawalPolicyId;
+    function setAccountVestingScheduleIfNotSet(address account, uint8 VestingScheduleId) internal {
+        if (balances[account].VestingSchedule == 0) {
+            balances[account].VestingSchedule = VestingScheduleId;
         }
     }
 
@@ -126,7 +126,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
 
     function calculateWithdrawalAmount(address account) public view returns (uint256) {
         Balance storage balance = balances[account];
-        WithdrawalPolicy storage policy = withdrawalPolicies[balance.withdrawalPolicy];
+        VestingSchedule storage policy = vestingSchedules[balance.VestingSchedule];
         uint256 tokensAwailable;
         if (block.timestamp >= withdrawalStartDate.add(policy.duration).sub(policy.interval.mul(policy.bonus))) {
             tokensAwailable = balance.initialCDO;
@@ -137,7 +137,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
             uint256 pastParts = timeSinceStart.div(policy.interval);
             tokensAwailable = (pastParts.add(policy.bonus)).mul(tokensByPart);
         }
-        return tokensAwailable.sub(balance.withdrawedCDO);
+        return tokensAwailable.sub(balance.withdrawnCDO);
     }
 
     function withdraw() public whenNotPaused {
@@ -152,9 +152,9 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
             emit ETHWithdrawal(_msgSender(), ethToSend);
         }
         if (cdoToSend > 0) {
-            balance.withdrawedCDO = balance.withdrawedCDO.add(cdoToSend);
+            balance.withdrawnCDO = balance.withdrawnCDO.add(cdoToSend);
             token.transfer(_msgSender(), cdoToSend);
-            emit CDOWithdrawal(_msgSender(), cdoToSend, balance.initialCDO.sub(balance.withdrawedCDO));
+            emit CDOWithdrawal(_msgSender(), cdoToSend, balance.initialCDO.sub(balance.withdrawnCDO));
         }
     }
 
@@ -177,7 +177,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         stage.tokensSold = stage.tokensSold.add(tokens);
         balances[_msgSender()].initialCDO = balances[_msgSender()].initialCDO.add(tokens);
         emit Deposit(_msgSender(), tokens);
-        setAccountWithdrawalPolicyIfNotSet(_msgSender(), 1);
+        setAccountVestingScheduleIfNotSet(_msgSender(), 1);
 
         address referral = getInputAddress();
         if (referral != address(0)) {
@@ -186,7 +186,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
             balances[referral].initialCDO = balances[referral].initialCDO.add(referralTokens);
             emit CDOReferralReward(referral, referralTokens);
             stage.refCDOAccrued = stage.refCDOAccrued.add(referralTokens);
-            setAccountWithdrawalPolicyIfNotSet(referral, 1);
+            setAccountVestingScheduleIfNotSet(referral, 1);
         }
 
         // transfer ETH
@@ -217,7 +217,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         stage.tokensSold = stage.tokensSold.add(tokens);
         balances[_msgSender()].initialCDO = balances[_msgSender()].initialCDO.add(tokens);
         emit Deposit(_msgSender(), tokens);
-        setAccountWithdrawalPolicyIfNotSet(_msgSender(), 1);
+        setAccountVestingScheduleIfNotSet(_msgSender(), 1);
 
         if (referral != address(0)) {
             require(referral != address(token) && referral != _msgSender() && referral != address(this), "CommonSale: Incorrect referral address.");
@@ -225,7 +225,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
             balances[referral].balanceETH = balances[referral].balanceETH.add(referralETH);
             emit ETHReferralReward(referral, referralETH);
             stage.refETHAccrued = stage.refETHAccrued.add(referralETH);
-            setAccountWithdrawalPolicyIfNotSet(referral, 1);
+            setAccountVestingScheduleIfNotSet(referral, 1);
             investment = investment.sub(referralETH);
         }
 

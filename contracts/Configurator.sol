@@ -45,9 +45,9 @@ contract Configurator is RecoverableFunds {
         sale.addStage(1632240000, 1632844800, 20,  30000000000000000, 0, 0, 28305000000000000000000000, 0, 0, 5, 10);
         sale.addStage(1632844800, 4788518400, 0,   30000000000000000, 0, 0, 28390000000000000000000000, 0, 0, 5, 10);
         // withdrawal policies
-        sale.setWithdrawalPolicy(1, 20 * 30, 30, 4); // 20% is available from the stat, 5% is released every month
-        sale.setWithdrawalPolicy(2, 20 * 30, 30, 3); // 15% is available from the stat, 5% is released every month
-        sale.setWithdrawalPolicy(3, 20 * 30, 30, 2); // 10% is available from the stat, 5% is released every month
+        sale.setVestingSchedule(1, 20 * 30, 30, 4); // 20% is available from the stat, 5% is released every month
+        sale.setVestingSchedule(2, 20 * 30, 30, 3); // 15% is available from the stat, 5% is released every month
+        sale.setVestingSchedule(3, 20 * 30, 30, 2); // 10% is available from the stat, 5% is released every month
         // accounts
         sale.setBalance(0x5219Cc08E635e9764c8014D984d60Fb7Ed200EEB, 150_000_000, 0, 0, 3); // TEAM account
         sale.setBalance(0x9Ce19eF683c3dA57C19a874d214073f0Cd3B7F71, 10_000_000, 0, 0, 3);  // MARKETING 1 account
