@@ -159,8 +159,9 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     }
 
     function buyWithCDOReferral() internal whenNotPaused returns (uint256) {
-        uint256 stageIndex = getCurrentStageOrRevert();
-        Stage storage stage = stages[stageIndex];
+        int256 stageIndex = getCurrentStage();
+        require(stageIndex >= 0, "StagedCrowdsale: No suitable stage found");
+        Stage storage stage = stages[uint256(stageIndex)];
 
         // check min investment limit
         require(msg.value >= stage.minInvestmentLimit, "CommonSale: The amount of ETH you sent is too small.");
@@ -198,8 +199,9 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     }
 
     function buyWithETHReferral(address referral) public payable whenNotPaused returns (uint256) {
-        uint256 stageIndex = getCurrentStageOrRevert();
-        Stage storage stage = stages[stageIndex];
+        int256 stageIndex = getCurrentStage();
+        require(stageIndex >= 0, "StagedCrowdsale: No suitable stage found");
+        Stage storage stage = stages[uint256(stageIndex)];
 
         // check min investment limit
         require(msg.value >= stage.minInvestmentLimit, "CommonSale: The amount of ETH you sent is too small.");

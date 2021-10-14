@@ -43,6 +43,7 @@ contract StagedCrowdsale is Ownable {
         uint256 refETHPercent,
         uint256 refCDOPercent
     ) public onlyOwner {
+        require(stages.length < type(uint256).max, "StagedCrowdsale: The maximum number of stages has been reached");
         stages.push(Stage(start, end, bonus, minInvestmentLimit, invested, tokensSold, hardcapInTokens, refETHAccrued, refCDOAccrued, refETHPercent, refCDOPercent));
     }
 
@@ -119,6 +120,7 @@ contract StagedCrowdsale is Ownable {
         uint256 refCDOPercent
     ) public onlyOwner {
         require(index < stages.length, "StagedCrowdsale: Wrong stage index");
+        require(stages.length < type(uint256).max, "StagedCrowdsale: The maximum number of stages has been reached");
         for (uint256 i = stages.length; i > index; i--) {
             stages[i] = stages[i - 1];
         }
@@ -132,13 +134,13 @@ contract StagedCrowdsale is Ownable {
         }
     }
 
-    function getCurrentStageOrRevert() public view returns (uint256) {
+    function getCurrentStage() public view returns (int256) {
         for (uint256 i = 0; i < stages.length; i++) {
             if (block.timestamp >= stages[i].start && block.timestamp < stages[i].end && stages[i].tokensSold <= stages[i].hardcapInTokens) {
-                return i;
+                return int256(i);
             }
         }
-        revert("StagedCrowdsale: No suitable stage found");
+        return -1;
     }
 
 }
