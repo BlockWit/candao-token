@@ -16,14 +16,14 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     struct VestingSchedule {
         uint256 duration;
         uint256 interval;
-        uint8 bonus; // amount of intervals that can be withdrawn immediately after start
+        uint8 offset; // the number of intervals that must be skipped immediately after start
     }
 
     struct Balance {
         uint256 initialCDO;
         uint256 withdrawnCDO;
         uint256 balanceETH;
-        uint8 VestingSchedule;
+        uint8 vestingSchedule;
     }
 
     IERC20Cutted public token;
@@ -76,31 +76,31 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         emit NewPrice(newPrice);
     }
 
-    function setBalance(address account, uint256 initialCDO, uint256 withdrawnCDO, uint256 balanceETH, uint8 VestingSchedule) public onlyOwner {
+    function setBalance(address account, uint256 initialCDO, uint256 withdrawnCDO, uint256 balanceETH, uint8 vestingSchedule) public onlyOwner {
         balances[account].initialCDO = initialCDO;
         balances[account].withdrawnCDO = withdrawnCDO;
         balances[account].balanceETH = balanceETH;
-        balances[account].VestingSchedule = VestingSchedule;
+        balances[account].vestingSchedule = vestingSchedule;
     }
 
-    function addBalances(address[] calldata addresses, uint256[] calldata balancesCDO, uint8 VestingSchedule) public onlyOwner {
+    function addBalances(address[] calldata addresses, uint256[] calldata balancesCDO, uint8 vestingSchedule) public onlyOwner {
         require(addresses.length == balancesCDO.length, "CommonSale: Incorrect array length.");
         for (uint256 i = 0; i < addresses.length; i++) {
             balances[addresses[i]].initialCDO = balances[addresses[i]].initialCDO.add(balancesCDO[i]);
-            setAccountVestingScheduleIfNotSet(addresses[i], VestingSchedule);
+            setAccountVestingScheduleIfNotSet(addresses[i], vestingSchedule);
             emit Deposit(addresses[i], balancesCDO[i]);
         }
     }
 
-    function setVestingSchedule(uint8 index, uint256 duration, uint256 interval, uint8 bonus) public onlyOwner {
+    function setVestingSchedule(uint8 index, uint256 duration, uint256 interval, uint8 offset) public onlyOwner {
         vestingSchedules[index].duration = duration * 1 days;
         vestingSchedules[index].interval = interval * 1 days;
-        vestingSchedules[index].bonus = bonus;
+        vestingSchedules[index].offset = offset;
     }
 
-    function setAccountVestingScheduleIfNotSet(address account, uint8 VestingScheduleId) internal {
-        if (balances[account].VestingSchedule == 0) {
-            balances[account].VestingSchedule = VestingScheduleId;
+    function setAccountVestingScheduleIfNotSet(address account, uint8 vestingScheduleId) internal {
+        if (balances[account].vestingSchedule == 0) {
+            balances[account].vestingSchedule = vestingScheduleId;
         }
     }
 
@@ -126,16 +126,16 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
 
     function calculateWithdrawalAmount(address account) public view returns (uint256) {
         Balance storage balance = balances[account];
-        VestingSchedule storage policy = vestingSchedules[balance.VestingSchedule];
+        VestingSchedule storage schedule = vestingSchedules[balance.vestingSchedule];
         uint256 tokensAwailable;
-        if (block.timestamp >= withdrawalStartDate.add(policy.duration).sub(policy.interval.mul(policy.bonus))) {
+        if (block.timestamp >= withdrawalStartDate.add(schedule.duration).sub(schedule.interval.mul(schedule.offset))) {
             tokensAwailable = balance.initialCDO;
         } else {
-            uint256 parts = policy.duration.div(policy.interval);
+            uint256 parts = schedule.duration.div(schedule.interval);
             uint256 tokensByPart = balance.initialCDO.div(parts);
             uint256 timeSinceStart = block.timestamp.sub(withdrawalStartDate);
-            uint256 pastParts = timeSinceStart.div(policy.interval);
-            tokensAwailable = (pastParts.add(policy.bonus)).mul(tokensByPart);
+            uint256 pastParts = timeSinceStart.div(schedule.interval);
+            tokensAwailable = (pastParts.add(schedule.offset)).mul(tokensByPart);
         }
         return tokensAwailable.sub(balance.withdrawnCDO);
     }
