@@ -127,6 +127,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     }
 
     function calculateVestedAmount(Balance memory balance, VestingSchedule memory schedule) internal view returns (uint256) {
+        if (block.timestamp < withdrawalStartDate.add(schedule.delay)) return 0;
         uint256 tokensAvailable;
         if (block.timestamp >= withdrawalStartDate.add(schedule.delay).add(schedule.duration)) {
             tokensAvailable = balance.initialCDO;
