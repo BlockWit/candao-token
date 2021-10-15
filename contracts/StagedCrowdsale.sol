@@ -27,7 +27,7 @@ contract StagedCrowdsale is Ownable {
 
     Stage[] public stages;
 
-    function stagesCount() public view returns (uint) {
+    function stagesCount() public view returns (uint256) {
         return stages.length;
     }
 
@@ -47,14 +47,6 @@ contract StagedCrowdsale is Ownable {
     ) public onlyOwner {
         require(stages.length < type(uint256).max, "StagedCrowdsale: The maximum number of stages has been reached");
         stages.push(Stage(start, end, bonus, minInvestmentLimit, invested, tokensSold, hardcapInTokens, refETHAccrued, refCDOAccrued, refETHPercent, refCDOPercent, vestingSchedule));
-    }
-
-    function removeStage(uint8 index) public onlyOwner {
-        require(index < stages.length, "StagedCrowdsale: Wrong stage index");
-        for (uint8 i = index; i < stages.length - 1; i++) {
-            stages[i] = stages[i + 1];
-        }
-        delete stages[stages.length - 1];
     }
 
     function updateStage(
@@ -94,6 +86,14 @@ contract StagedCrowdsale is Ownable {
         stages[index] = stage;
     }
 
+    function deleteStage(uint256 index) public onlyOwner {
+        require(index < stages.length, "StagedCrowdsale: Wrong stage index");
+        for (uint256 i = index; i < stages.length - 1; i++) {
+            stages[i] = stages[i + 1];
+        }
+        delete stages[stages.length - 1];
+    }
+
     function deleteStages() public onlyOwner {
         require(stages.length > 0, "StagedCrowdsale: Stages already empty");
         for (uint256 i = 0; i < stages.length; i++) {
@@ -103,11 +103,17 @@ contract StagedCrowdsale is Ownable {
 
     function getCurrentStage() public view returns (int256) {
         for (uint256 i = 0; i < stages.length; i++) {
-            if (block.timestamp >= stages[i].start && block.timestamp < stages[i].end && stages[i].tokensSold <= stages[i].hardcapInTokens) {
+            if (block.timestamp >= stages[i].start && block.timestamp < stages[i].end && stages[i].tokensSold < stages[i].hardcapInTokens) {
                 return int256(i);
             }
         }
         return -1;
+    }
+
+    function getCurrentStageOrRevert() internal view returns (uint256) {
+        int256 index = getCurrentStage();
+        require(index >= 0, "StagedCrowdsale: No suitable stage found");
+        return uint256(index);
     }
 
 }

@@ -26,6 +26,13 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         uint256 balanceETH;
     }
 
+    struct AccountInfo {
+        uint256 initialCDO;
+        uint256 withdrawnCDO;
+        uint256 vestedCDO;
+        uint256 balanceETH;
+    }
+
     IERC20Cutted public token;
     uint256 public price; // amount of tokens per 1 ETH
     uint256 public percentRate = 100;
@@ -134,18 +141,22 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
         return tokensAvailable.sub(balance.withdrawnCDO);
     }
 
-    function calculateVestedAmount(address account) public view returns (uint256) {
-        uint256 tokens;
+    function getAccountInfo(address account) public view returns (AccountInfo memory) {
+        uint256 initialCDO;
+        uint256 withdrawnCDO;
+        uint256 vestedCDO;
+        uint256 balanceETH;
         for (uint256 stageIndex = 0; stageIndex < stages.length; stageIndex++) {
             Balance memory balance = balances[stageIndex][account];
-            if (balance.initialCDO == 0) continue;
             uint8 scheduleIndex = stages[stageIndex].vestingSchedule;
             VestingSchedule memory schedule = vestingSchedules[scheduleIndex];
             uint256 vestedAmount = calculateVestedAmount(balance, schedule);
-            if (vestedAmount == 0) continue;
-            tokens = tokens.add(vestedAmount);
+            initialCDO = initialCDO.add(balance.initialCDO);
+            withdrawnCDO = withdrawnCDO.add(balance.withdrawnCDO);
+            vestedCDO = vestedCDO.add(vestedAmount);
+            balanceETH = balanceETH.add(balance.balanceETH);
         }
-        return tokens;
+        return AccountInfo(initialCDO, withdrawnCDO, vestedCDO, balanceETH);
     }
 
     function withdraw() public whenNotPaused {
@@ -180,9 +191,7 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     }
 
     function buyWithCDOReferral() internal whenNotPaused returns (uint256) {
-        int256 idx = getCurrentStage();
-        require(idx >= 0, "StagedCrowdsale: No suitable stage found");
-        uint256 stageIndex = uint256(idx);
+        uint256 stageIndex = getCurrentStageOrRevert();
         Stage storage stage = stages[stageIndex];
 
         // check min investment limit
@@ -219,10 +228,8 @@ contract CommonSale is StagedCrowdsale, Pausable, RecoverableFunds, InputAddress
     }
 
     function buyWithETHReferral(address referral) public payable whenNotPaused returns (uint256) {
-        int256 idx = getCurrentStage();
-        require(idx >= 0, "StagedCrowdsale: No suitable stage found");
-        uint256 stageIndex = uint256(idx);
-        Stage storage stage = stages[uint256(stageIndex)];
+        uint256 stageIndex = getCurrentStageOrRevert();
+        Stage storage stage = stages[stageIndex];
 
         // check min investment limit
         require(msg.value >= stage.minInvestmentLimit, "CommonSale: The amount of ETH you sent is too small.");
