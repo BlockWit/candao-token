@@ -37,7 +37,7 @@ contract CommonSale is Pausable, RecoverableFunds {
     uint256 public withdrawalStartDate;
     mapping(uint8 => VestingSchedule) public vestingSchedules;
     mapping(uint8 => mapping(address => Balance)) public balances;
-    uint8[] groups;
+    uint8[] public groups;
 
     event Withdrawal(address account, uint256 value);
     event WithdrawalIsActive();
@@ -85,6 +85,28 @@ contract CommonSale is Pausable, RecoverableFunds {
         schedule.duration = duration;
         schedule.interval = interval;
         schedule.unlocked = unlocked;
+    }
+
+    function groupsCount() public view returns (uint256) {
+        return groups.length;
+    }
+
+    function addGroup(uint8 vestingSchedule) public onlyOwner {
+        require(groups.length < type(uint256).max, "VestingWallet: the maximum number of groups has been reached");
+        groups.push(vestingSchedule);
+    }
+
+    function updateGroup(uint256 index, uint8 vestingSchedule) public onlyOwner {
+        require(index < groups.length, "VestingWallet: wrong group index");
+        groups[index] = vestingSchedule;
+    }
+
+    function deleteGroup(uint256 index) public onlyOwner {
+        require(index < groups.length, "VestingWallet: wrong group index");
+        for (uint256 i = index; i < groups.length - 1; i++) {
+            groups[i] = groups[i + 1];
+        }
+        delete groups[groups.length - 1];
     }
 
     function calculateVestedAmount(Balance memory balance, VestingSchedule memory schedule) internal view returns (uint256) {
