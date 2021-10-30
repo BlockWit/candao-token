@@ -52,4 +52,6 @@ contracts/.deps
 contracts/artifacts
 
 # temporary artifact from solidity-coverage
-allFiredEvents
+front/index.bundle.js
+front/index.bundle.js.LICENSE.txt
+front/index.bundle.js.map
