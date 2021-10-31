@@ -30,11 +30,12 @@ describe('VestingWallet', async function () {
   });
 
   it('should add group correctly', async function () {
+    const VALUE = 123;
     const groupsCountBefore = await wallet.groupsCount();
-    await wallet.addGroup(11, { from: owner });
+    await wallet.addGroup(VALUE, { from: owner });
     const groupsCountAfter = await wallet.groupsCount();
     expect(groupsCountAfter).to.be.bignumber.equal(groupsCountBefore.addn(1));
-    expect(await wallet.groups(groupsCountAfter.subn(1))).to.be.bignumber.equal(new BN(11));
+    expect(await wallet.groups(groupsCountAfter.subn(1))).to.be.bignumber.equal(new BN(VALUE));
   });
 
   it('should update group correctly', async function () {
