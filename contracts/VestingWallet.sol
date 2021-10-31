@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./interfaces/IERC20Cutted.sol";
 import "./RecoverableFunds.sol";
 import "./CandaoToken.sol";
-import "./InputAddress.sol";
 
 contract VestingWallet is Pausable, RecoverableFunds {
 
@@ -106,7 +105,7 @@ contract VestingWallet is Pausable, RecoverableFunds {
         for (uint256 i = index; i < groups.length - 1; i++) {
             groups[i] = groups[i + 1];
         }
-        delete groups[groups.length - 1];
+        groups.pop();
     }
 
     function calculateVestedAmount(Balance memory balance, VestingSchedule memory schedule) internal view returns (uint256) {
