@@ -5,13 +5,13 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./RecoverableFunds.sol";
 import "./CandaoToken.sol";
-import "./CommonSale.sol";
+import "./VestingWallet.sol";
 
 contract Configurator is RecoverableFunds {
     using Address for address;
 
     CandaoToken public token;
-    CommonSale public sale;
+    VestingWallet public sale;
 
     constructor() {
         address OWNER_ADDRESS      = address(0x0b2cBc8a2D434dc16818B0664Dd81e89fAA9c3AC);
@@ -37,7 +37,7 @@ contract Configurator is RecoverableFunds {
         supplies[6] = 548_500_000 ether; // SALE (seed, private sale, public sale, marketing, team, advisors)
 
         // create sale
-        sale = new CommonSale();
+        sale = new VestingWallet();
         // stages
 
         // withdrawal policies

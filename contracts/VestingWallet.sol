@@ -9,7 +9,7 @@ import "./RecoverableFunds.sol";
 import "./CandaoToken.sol";
 import "./InputAddress.sol";
 
-contract CommonSale is Pausable, RecoverableFunds {
+contract VestingWallet is Pausable, RecoverableFunds {
 
     using SafeMath for uint256;
 
