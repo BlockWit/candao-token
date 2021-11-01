@@ -19,18 +19,18 @@ contract Configurator is RecoverableFunds {
         // set percent rate
         wallet.setPercentRate(1000);
         // groups
-        wallet.addGroup(1);
-        wallet.addGroup(2);
-        wallet.addGroup(3);
-        wallet.addGroup(4);
-        wallet.addGroup(5);
-        wallet.addGroup(6);
-        wallet.addGroup(7);
-        wallet.addGroup(8);
-        wallet.addGroup(9);
-        wallet.addGroup(10);
-        wallet.addGroup(11);
-        wallet.addGroup(12);
+        wallet.addGroup(1);     // Seed round
+        wallet.addGroup(2);     // Private round A
+        wallet.addGroup(3);     // Private round B
+        wallet.addGroup(4);     // Private round C
+        wallet.addGroup(5);     // Public sale
+        wallet.addGroup(6);     // Ecosystem rewards pool
+        wallet.addGroup(7);     // Candao foundation
+        wallet.addGroup(8);     // Liquidity pools & reserves
+        wallet.addGroup(9);     // Team
+        wallet.addGroup(10);    // Strategic partnerships
+        wallet.addGroup(11);    // Advisors
+        wallet.addGroup(12);    // Marketing
         // vesting schedules
         // investors
         wallet.setVestingSchedule(1,  24 weeks, 104 weeks, 1 weeks, 40);
