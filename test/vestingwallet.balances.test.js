@@ -14,7 +14,7 @@ const VESTING_SCHEDULES = [
   { index: 2, delay: time.duration.weeks(24), duration: time.duration.weeks(104), interval: time.duration.weeks(1), unlocked: 6 }
 ];
 
-describe('CommonSale', async function () {
+describe('VestingWallet', async function () {
   let token;
   let wallet;
 

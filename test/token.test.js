@@ -1,6 +1,6 @@
-const { accounts, contract, web3 } = require('@openzeppelin/test-environment');
-const { balance, BN, constants, ether, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
-const { assert, expect } = require('chai');
+const { accounts, contract } = require('@openzeppelin/test-environment');
+const { constants, ether, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
+const { expect } = require('chai');
 const { ZERO_ADDRESS } = constants;
 const { shouldBehaveLikeERC20 } = require('./behaviors/ERC20.behavior');
 const { shouldBehaveLikeERC20Burnable } = require('./behaviors/ERC20Burnable.behavior');
@@ -22,19 +22,19 @@ const initialAccounts = [account1, account2, account3, account4, account5, accou
 const initialBalances = [SUPPLY1, SUPPLY2, SUPPLY3, SUPPLY4, SUPPLY5, SUPPLY6, SUPPLY7, SUPPLY8];
 
 describe('ERC20', function () {
-  
+
   beforeEach(async function() {
     this.token = await Token.new('Candao', 'CDO', [account1], [SUPPLY1], {from: owner});
   })
-  
+
   shouldBehaveLikeERC20("ERC20", SUPPLY1, account1, account2, account3);
   shouldBehaveLikeERC20Burnable(account1, SUPPLY1, [account2]);
   shouldBehaveLikeWithCallback(owner, account1, account2, account3);
-  
+
 });
 
 describe('RecoverableFunds', function () {
-  
+
   beforeEach(async function() {
     this.testedContract = await Token.new('Candao', 'CDO', [account1], [SUPPLY1], {from: owner});
   })
@@ -172,7 +172,7 @@ describe('CandaoToken', async function () {
       });
     });
   });
-  
-  
+
+
 });
 
