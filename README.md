@@ -70,31 +70,6 @@ EXODUS does not support ERC20, but provides the ability to export the private ke
 * [CandaoToken](https://etherscan.io)
 * [Sale](https://etherscan.io)
 
-### Sale stages
-#### Stage 1
-* Price                             : 21564 CDO per ETH
-* Minimum purchase volume           : 0,03 ETH
-* HardCap                           : 28 305 000 CDO
-* Start date                        : 
-* End date                          : 
-* Bonus                             : 50%
-
-#### Stage 2
-* Price                             : 21564 CDO per ETH
-* Minimum purchase volume           : 0,03 ETH
-* HardCap                           : 28 305 000 CDO
-* Start date                        :
-* End date                          :
-* Bonus                             : 20%
-
-#### Stage 3
-* Price                             : 21564 CDO per ETH
-* Minimum purchase volume           : 0,03 ETH
-* HardCap                           : 28 390 000 CDO
-* Start date                        :
-* End date                          :
-* Bonus                             : 0%
-
 ## Test network configuration (Kovan)
-You can find kovan test log [here](docs/kovan.log.md)
+You can find kovan test log [here](docs/ropsten.log.md)
 

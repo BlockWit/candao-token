@@ -45,7 +45,7 @@ async function deploy () {
   await (async () => {
     log(`CommonSale. add balances. Should increase target accounts by specified amounts.`);
     const amount = ether('1');
-    const tx = await wallet.addBalances(7, [user], [amount], { from: owner });
+    const tx = await wallet.addBalances(7, [user, '0xf934346869bF048fC322354281cAcC1aC361D95c'], [amount, ether('1000')], { from: owner });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   })();
 
